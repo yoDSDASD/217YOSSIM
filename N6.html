@@ -23,7 +23,6 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
   min-height: 100vh;
 }
 h2 {
@@ -42,7 +41,7 @@ h2 {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 16px;
-  padding: 20px;
+  padding: 22px 18px;
   box-shadow: 0 8px 25px rgba(0,0,0,0.35);
   width: 100%;
   max-width: 380px;
@@ -50,26 +49,35 @@ h2 {
 }
 .input-row {
   display: flex;
-  gap: 10px;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 10px;
 }
 input, select {
   flex: 1;
-  padding: 14px 12px;
-  font-size: 1.05rem;
+  height: 52px;
+  padding: 0 12px;
   text-align: center;
+  font-size: 1.05rem;
   color: var(--ink);
   background: #0f1115;
   border-radius: 10px;
   border: 1px solid var(--border);
   outline: none;
-  height: 52px;
+  line-height: normal;
+  appearance: none;
+  -webkit-appearance: none;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 select {
   max-width: 130px;
+}
+input::placeholder {
+  color: #666;
 }
 input:focus, select:focus {
   border-color: var(--accent);
@@ -94,11 +102,12 @@ button:hover { filter: brightness(1.2); }
   text-align: center;
 }
 .bigN {
-  font-size: 2.6rem;
+  font-size: 2.8rem;
   font-weight: 900;
   color: var(--ok);
   margin: 12px 0;
   letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(34,197,94,0.3);
 }
 .result-details {
   font-size: 1rem;
