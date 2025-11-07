@@ -3,54 +3,41 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>מכשירי יצור — PRO</title>
+<title>מכשירי יצור - פינים לקדחים</title>
 <style>
   *{box-sizing:border-box}
   body{margin:0;font-family:"Heebo",system-ui,Arial;background:#f6f6f6;color:#111}
-  .wrap{max-width:380px;margin:0 auto;padding:2.2vh 4vw}
-  .title{font-size:1.25rem;font-weight:800;text-align:center;margin:0 0 .7rem}
+  .wrap{max-width:380px;margin:0 auto;padding:2.5vh 4vw}
+  .title{font-size:1.3rem;font-weight:800;text-align:center;margin:0 0 .9rem}
   .row{display:flex;flex-direction:column;margin:.55rem 0}
-  label{font-size:.92rem;font-weight:700;margin-bottom:.25rem}
-  input,select{padding:.5em .6em;font-size:1.02rem;border:1px solid #bbb;border-radius:.35em;text-align:center;direction:ltr;background:#fff}
-  input:focus,select:focus{outline:none;border-color:#000}
-  .btn{width:100%;padding:.65em;margin-top:.6rem;font-size:1.05rem;font-weight:700;border:0;border-radius:.45em;cursor:pointer}
+  label{font-size:.9rem;font-weight:700;margin-bottom:.25rem}
+  input{padding:.5em .6em;font-size:1.05rem;border:1px solid #bbb;border-radius:.35em;text-align:center;direction:ltr;background:#fff}
+  input:focus{outline:none;border-color:#000}
+  .btn{width:100%;padding:.6em;margin-top:.6rem;font-size:1.05rem;font-weight:700;border:0;border-radius:.45em;cursor:pointer}
   .primary{background:#000;color:#fff}
   .primary:hover{background:#222}
   .secondary{background:#ddd}
   .secondary:hover{background:#bbb}
-  .panel{display:none;background:#fff;border:1px solid #999;border-radius:.5em;padding:.7em;margin-top:.75rem;font-family:monospace;direction:ltr;text-align:left}
-  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
-  .kpi{border:1px dashed #bbb;border-radius:.4em;padding:.5em .6em}
-  .kpi b{color:#c00000}
-  .rangeLine{margin-top:.5rem;text-align:center;background:#efefef;border:1px solid #ccc;border-radius:.35em;padding:.45em;font-weight:700}
-  .seriesBox{margin-top:.8rem;max-height:240px;overflow:auto;background:#fafafa;border:1px solid #e0e0e0;border-radius:.5em;padding:.5em}
-  .pin{padding:.18em .3em;border-radius:.3em}
-  .go{background:#e9f8ef}
+  .seriesBox{display:none;margin-top:1rem;max-height:260px;overflow:auto;background:#fff;border:1px solid #ccc;border-radius:.5em;padding:.6em;font-family:monospace;font-size:1.05rem;direction:ltr;text-align:left}
+  .pin{padding:.22em .35em;border-radius:.3em;display:inline-block;width:80px}
+  .go{background:#e8f9ed;font-weight:700}
   .go b{color:#0a7f3f}
-  .nogo{background:#fdecec}
+  .nogo{background:#fdeaea;font-weight:700}
   .nogo b{color:#b10808}
-  .legend{display:flex;gap:.5rem;align-items:center;font-size:.9rem;margin-top:.4rem}
-  .dot{display:inline-block;width:.8em;height:.8em;border-radius:2px;margin-inline-end:.35em;vertical-align:middle}
+  .legend{display:flex;gap:.6rem;align-items:center;font-size:.9rem;margin-top:.6rem}
+  .dot{width:.8em;height:.8em;display:inline-block;border-radius:2px;margin-inline-end:.35em;vertical-align:middle}
   .dot.go{background:#0a7f3f}
   .dot.nogo{background:#b10808}
-  @media (max-width:480px){
-    .wrap{padding:2.2vh 5vw}
-    .title{font-size:1.2rem}
-    input,select{font-size:1rem}
+  @media(max-width:480px){
+    .wrap{padding:2.5vh 5vw}
+    input{font-size:1rem}
+    .seriesBox{font-size:1rem}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="title">מכשירי יצור — PRO</div>
-
-  <div class="row">
-    <label for="mode">סוג בדיקה</label>
-    <select id="mode">
-      <option value="hole">קדח (Hole): Go קטן, No-Go גדול</option>
-      <option value="shaft">קוטר חיצוני (Shaft): Go גדול, No-Go קטן</option>
-    </select>
-  </div>
+  <div class="title">מכשירי יצור - פינים לקדחים</div>
 
   <div class="row">
     <label for="nominal">NOM</label>
@@ -70,106 +57,64 @@
   <button class="btn primary" onclick="calc()">חשב</button>
   <button class="btn secondary" onclick="resetAll()">איפוס</button>
 
-  <div class="panel" id="out">
-    <div class="kpis">
-      <div class="kpi">MAX: <b id="maxv">—</b></div>
-      <div class="kpi">MIN: <b id="minv">—</b></div>
-      <div class="kpi">RANGE: <b id="rng">—</b></div>
-      <div class="kpi">NOM: <b id="nomv">—</b></div>
-    </div>
-    <div class="rangeLine" id="rline">— ⇐ טווח ⇒ —</div>
-
-    <div class="legend">
-      <span><span class="dot go"></span>Go</span>
-      <span><span class="dot nogo"></span>No-Go</span>
-      <span style="opacity:.7">| קפיצה: 0.01 מ״מ (סט פינים)</span>
-    </div>
-
-    <div class="seriesBox" id="series"></div>
+  <div class="legend">
+    <span><span class="dot go"></span>Go (פין קטן)</span>
+    <span><span class="dot nogo"></span>No-Go (פין גדול)</span>
   </div>
+
+  <div class="seriesBox" id="series"></div>
 </div>
 
 <script>
-  const fmt = v => parseFloat(v).toFixed(3);
+const fmt = v => parseFloat(v).toFixed(3);
+function blurInputs(){document.querySelectorAll('input').forEach(el=>el.blur());}
 
-  function blurInputs(){ document.querySelectorAll('input,select').forEach(el=>el.blur()); }
+function calc(){
+  blurInputs();
+  const nom = parseFloat(document.getElementById('nominal').value);
+  const tp = parseFloat(document.getElementById('tolp').value);
+  const tm = parseFloat(document.getElementById('tolm').value);
+  const box = document.getElementById('series');
 
-  function calc(){
-    blurInputs();
-    const mode = document.getElementById('mode').value;
-    const nom = parseFloat(document.getElementById('nominal').value);
-    const tp  = parseFloat(document.getElementById('tolp').value);
-    const tm  = parseFloat(document.getElementById('tolm').value);
-    const out = document.getElementById('out');
-    const maxEl = document.getElementById('maxv');
-    const minEl = document.getElementById('minv');
-    const rngEl = document.getElementById('rng');
-    const nomEl = document.getElementById('nomv');
-    const rline = document.getElementById('rline');
-    const series = document.getElementById('series');
-
-    if (isNaN(nom)){
-      out.style.display='block';
-      series.innerHTML='';
-      document.getElementById('rline').textContent='יש להזין ערך נומינלי';
-      return;
-    }
-    const up = isNaN(tp)?0:tp;
-    const lo = isNaN(tm)?0:tm;
-
-    const max = nom + up;
-    const min = nom - lo;
-    const range = max - min;
-
-    maxEl.textContent = fmt(max);
-    minEl.textContent = fmt(min);
-    rngEl.textContent = fmt(range);
-    nomEl.textContent = fmt(nom);
-    rline.textContent = `${fmt(min)} ⇐ טווח ⇒ ${fmt(max)}`;
-    out.style.display='block';
-
-    // סדרת פינים תקנית: קפיצה 0.01 מ״מ
-    const step = 0.01;
-    const start = Math.ceil(min*100)/100;   // עיגול כלפי מעלה ל-0.01
-    const end   = Math.floor(max*100)/100;  // עיגול כלפי מטה ל-0.01
-
-    // בחירת Go / No-Go לפי מצב
-    let goVal, noGoVal;
-    if (mode === 'hole'){      // קדח: Go קטן, No-Go גדול
-      goVal   = start;
-      noGoVal = end;
-    } else {                   // קוטר חיצוני: Go גדול, No-Go קטן
-      goVal   = end;
-      noGoVal = start;
-    }
-
-    // בניית הרשימה האנכית
-    let html = '';
-    if (start > end) {
-      html = '<div>אין פינים בתחום הזה</div>';
-    } else {
-      for (let v = start; v <= end + 1e-6; v = Math.round((v+step)*100)/100){
-        const val = fmt(v);
-        let cls = 'pin';
-        let label = '';
-        if (Math.abs(v - goVal)   < 1e-6){ cls += ' go';   label = ' <b>Go</b>'; }
-        if (Math.abs(v - noGoVal) < 1e-6){ cls += ' nogo'; label = ' <b>No-Go</b>'; }
-        html += `<div class="${cls}">${val}${label}</div>`;
-      }
-    }
-    series.innerHTML = html;
-
-    // גלילה אוטומטית להדגשות (אם יש)
-    const firstMark = series.querySelector('.go, .nogo');
-    if (firstMark) firstMark.scrollIntoView({behavior:'smooth', block:'center'});
+  if(isNaN(nom)){
+    box.style.display='block';
+    box.innerHTML='יש להזין ערך נומינלי תקין';
+    return;
   }
 
-  function resetAll(){
-    blurInputs();
-    ['nominal','tolp','tolm'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('out').style.display='none';
-    document.getElementById('series').innerHTML='';
+  const up = isNaN(tp)?0:tp;
+  const lo = isNaN(tm)?0:tm;
+  const max = nom + up;
+  const min = nom - lo;
+
+  const step = 0.01;
+  const start = Math.ceil(min*100)/100;
+  const end = Math.floor(max*100)/100;
+
+  let html = "";
+  if(start > end){
+    html = "אין פינים בתחום זה";
+  }else{
+    const goVal = start;
+    const noGoVal = end;
+    for(let v=start; v<=end+1e-6; v=Math.round((v+step)*100)/100){
+      const val = fmt(v);
+      if(Math.abs(v-goVal)<1e-6) html += `<div class="pin go">${val} <b>Go</b></div>`;
+      else if(Math.abs(v-noGoVal)<1e-6) html += `<div class="pin nogo">${val} <b>No-Go</b></div>`;
+      else html += `<div class="pin">${val}</div>`;
+    }
   }
+  box.innerHTML = html;
+  box.style.display='block';
+}
+
+function resetAll(){
+  blurInputs();
+  ['nominal','tolp','tolm'].forEach(id=>document.getElementById(id).value='');
+  const box=document.getElementById('series');
+  box.innerHTML='';
+  box.style.display='none';
+}
 </script>
 </body>
 </html>
