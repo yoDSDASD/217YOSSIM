@@ -14,7 +14,7 @@
   }
 
   .container {
-    max-width: 360px;
+    max-width: 380px;
     margin: 0 auto;
     padding: 2.5vh 4vw;
   }
@@ -61,10 +61,33 @@
     padding: 0.6em;
     margin-top: 0.8rem;
     font-family: monospace;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     display: none;
     direction: ltr;
     text-align: left;
+  }
+
+  .series {
+    margin-top: 0.6rem;
+    background: #efefef;
+    border-radius: 0.4em;
+    padding: 0.5em 0.6em;
+    font-family: monospace;
+    font-size: 1.05rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    text-align: left;
+    direction: ltr;
+    display: none;
+    border: 1px solid #ccc;
+  }
+
+  .series::-webkit-scrollbar {
+    height: 6px;
+  }
+  .series::-webkit-scrollbar-thumb {
+    background: #aaa;
+    border-radius: 3px;
   }
 
   .highlight { color: #c00000; }
@@ -99,7 +122,7 @@
     .container { padding: 2.5vh 5vw; }
     .title { font-size: 1.25rem; }
     input { font-size: 1rem; }
-    .result { font-size: 1.05rem; }
+    .result, .series { font-size: 1rem; }
   }
 </style>
 </head>
@@ -124,6 +147,7 @@
   </div>
 
   <div class="result" id="result"></div>
+  <div class="series" id="series"></div>
 
   <button class="calc-btn" onclick="calculate()">חשב</button>
   <button class="reset-btn" onclick="resetCalc()">איפוס</button>
@@ -144,12 +168,14 @@ function calculate() {
   const upperInput = document.getElementById("upperTol").value;
   const lowerInput = document.getElementById("lowerTol").value;
   const resultEl = document.getElementById("result");
+  const seriesEl = document.getElementById("series");
 
   let upper = parseFloat(upperInput);
   let lower = parseFloat(lowerInput);
 
   if (isNaN(nominal)) {
     resultEl.style.display = "block";
+    seriesEl.style.display = "none";
     resultEl.innerHTML = "יש להזין ערך נומינלי תקין";
     return;
   }
@@ -169,14 +195,28 @@ function calculate() {
 
   resultEl.innerHTML = output;
   resultEl.style.display = "block";
+
+  // יצירת הסדרה בפועל
+  const steps = 100; // מספר הערכים שיראה
+  const stepSize = range / steps;
+  let seriesOutput = "";
+  for (let i = 0; i <= steps; i++) {
+    const val = min + (i * stepSize);
+    seriesOutput += format(val);
+    if (i < steps) seriesOutput += " | ";
+  }
+
+  seriesEl.innerHTML = seriesOutput;
+  seriesEl.style.display = "block";
 }
 
 function resetCalc() {
   blurAllInputs();
   ["nominal","upperTol","lowerTol"].forEach(id => document.getElementById(id).value = "");
-  const resultEl = document.getElementById("result");
-  resultEl.innerHTML = "";
-  resultEl.style.display = "none";
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("result").style.display = "none";
+  document.getElementById("series").innerHTML = "";
+  document.getElementById("series").style.display = "none";
 }
 </script>
 
