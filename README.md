@@ -1,6 +1,3 @@
-<h2>קישורים לכל הדפים</h2>
-<ul>
-  <li><a href="N6.html">מחשבון N6</a></li>
-  <li><a href="MAX.html">דף MAX</a></li>
-    <li><a href="MAX.html">דף MAX</a></li>
-</ul>
+[מחשבון N6](https://yourname.github.io/yourrepo/N6.html)
+[מחשבון MAX](https://yourname.github.io/yourrepo/MAX.html)
+[בלוקי ג׳ונסון PRO+](https://yourname.github.io/yourrepo/PRO.html)
