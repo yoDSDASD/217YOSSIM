@@ -5,39 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>מכשירי יצור</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     html, body {
       margin: 0;
       padding: 0;
       font-family: "Heebo", sans-serif;
       background: #f7f7f7;
-      width: 100%;
       height: 100%;
+      width: 100%;
     }
-
     .container {
       max-width: 450px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 4vw;
+      margin: auto;
+      padding: 5vw;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       min-height: 100vh;
     }
-
     .title {
       font-size: 6vw;
       font-weight: bold;
-      margin-bottom: 3vw;
+      color: #000;
       text-align: center;
-      color: #111;
+      margin-bottom: 4vw;
     }
-
     .input-row {
       display: flex;
       justify-content: space-between;
@@ -45,46 +38,39 @@
       margin: 2vw 0;
       width: 100%;
     }
-
     label {
       flex: 1;
+      font-size: 4.2vw;
       font-weight: bold;
-      font-size: 4vw;
-      color: #000;
     }
-
     input {
       flex: 2;
       padding: 1em;
       font-size: 4vw;
+      border: 1px solid #333;
       border-radius: 0.6em;
-      border: 1px solid #555;
       text-align: center;
       direction: ltr;
+      transition: 0.15s;
     }
-
+    input:focus { outline: none; border-color: #000; }
     .result {
       width: 100%;
       background: #fff;
-      border: 2px solid #111;
+      border: 2px solid #000;
       border-radius: 1em;
       padding: 1.2em;
       margin-top: 4vw;
       font-size: 4.5vw;
       font-weight: bold;
+      color: #000;
       text-align: left;
       direction: ltr;
       font-family: monospace;
-      color: #000;
       display: none;
-      word-wrap: break-word;
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
-
-    .highlight {
-      color: #d40000;
-    }
-
+    .highlight { color: #d40000; }
     button {
       width: 100%;
       padding: 1em;
@@ -96,26 +82,15 @@
       cursor: pointer;
       transition: 0.3s;
     }
-
-    button:hover {
-      opacity: 0.9;
-    }
-
-    .calc-btn {
-      background: #111;
-      color: #fff;
-    }
-
-    .reset-btn {
-      background: #ccc;
-      color: #000;
-    }
-
+    .calc-btn { background: #000; color: #fff; }
+    .calc-btn:hover { background: #222; }
+    .reset-btn { background: #ccc; color: #000; }
+    .reset-btn:hover { background: #aaa; }
     @media (min-width: 600px) {
       .title { font-size: 2em; }
       input { font-size: 1.2em; }
-      .result { font-size: 1.3em; }
       button { font-size: 1.1em; }
+      .result { font-size: 1.2em; }
     }
   </style>
 </head>
@@ -148,15 +123,19 @@ function format(v) {
   return parseFloat(v).toFixed(3);
 }
 
+function blurAllInputs() {
+  document.querySelectorAll("input").forEach(inp => inp.blur());
+}
+
 function calculate() {
+  blurAllInputs(); // סוגר מקלדת באייפון
   const nominal = parseFloat(document.getElementById("nominal").value);
   const upperInput = document.getElementById("upperTol").value;
   const lowerInput = document.getElementById("lowerTol").value;
+  const resultEl = document.getElementById("result");
 
   let upper = parseFloat(upperInput);
   let lower = parseFloat(lowerInput);
-
-  const resultEl = document.getElementById("result");
 
   if (isNaN(nominal)) {
     resultEl.style.display = "block";
@@ -172,26 +151,18 @@ function calculate() {
   const range = max - min;
 
   let output = "";
-  if (upper > 0) {
-    output += `<div><strong class="highlight">MAX:</strong> ${format(max)}</div>`;
-  }
-  if (lower > 0) {
-    output += `<div><strong class="highlight">MIN:</strong> ${format(min)}</div>`;
-  }
-  if (upper > 0 && lower > 0) {
-    output += `<hr><div><strong>RANGE:</strong> ${format(range)}</div>`;
-  }
-
+  if (upper > 0) output += `<div><strong class="highlight">MAX:</strong> ${format(max)}</div>`;
+  if (lower > 0) output += `<div><strong class="highlight">MIN:</strong> ${format(min)}</div>`;
+  if (upper > 0 && lower > 0) output += `<hr><div><strong>RANGE:</strong> ${format(range)}</div>`;
   if (!output) output = `<div>אין נתונים להצגה</div>`;
 
-  resultEl.style.display = "block";
   resultEl.innerHTML = output;
+  resultEl.style.display = "block";
 }
 
 function resetCalc() {
-  document.getElementById("nominal").value = "";
-  document.getElementById("upperTol").value = "";
-  document.getElementById("lowerTol").value = "";
+  blurAllInputs();
+  ["nominal","upperTol","lowerTol"].forEach(id => document.getElementById(id).value = "");
   const resultEl = document.getElementById("result");
   resultEl.innerHTML = "";
   resultEl.style.display = "none";
