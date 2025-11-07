@@ -3,75 +3,81 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>מחשבון בלוקי ג'ונסון PRO+</title>
+<title>מחשבון בלוקי ג'ונסון PRO INDUSTRIAL</title>
 <style>
-:root{--bg:#0b0c10;--card:#14171d;--ink:#f2f2f2;--muted:#a7a7a7;--accent:#4da3ff}
+:root{--bg:#0b0c10;--card:#15181e;--ink:#f2f2f2;--accent:#4da3ff;--ok:#2ed47a}
 body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial;
 background:var(--bg);color:var(--ink)}
-header{text-align:center;padding:20px}
+header{text-align:center;padding:22px}
 h1{margin:0;font-size:1.4rem}
 .card{background:var(--card);border:1px solid #1f232b;border-radius:14px;
-padding:16px;margin:12px auto;max-width:920px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+padding:18px;margin:12px auto;max-width:800px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 input,select,button{width:100%;padding:10px;border-radius:8px;
 border:1px solid #1f232b;background:#0e1216;color:var(--ink);font-size:1rem}
 button{background:var(--accent);color:#001428;font-weight:700;cursor:pointer}
-.stack{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.tag{padding:8px 10px;border:1px solid #1f232b;border-radius:10px;background:#0e131a}
-.ok{color:#2ed47a}
+.result{line-height:1.6;font-size:1.05rem}
+.ok{color:var(--ok);font-weight:700}
 </style>
 </head>
 <body>
 <header>
-<h1>מחשבון PRO+ – בלוקי ג'ונסון</h1>
-<div style="color:var(--muted);font-size:.9rem">מהיר במיוחד – כולל עד 250 מ״מ</div>
+<h1>מחשבון PRO INDUSTRIAL – בלוקי ג'ונסון</h1>
+<div style="color:#a7a7a7;font-size:.9rem">מחשב לפי הסט הפיזי שלך (1.005–250 מ"מ)</div>
 </header>
 
 <div class="card">
 <label>מידה נומינלית (מ״מ)</label>
-<input id="nominal" type="number" step="0.001" placeholder="למשל 127.486">
-<label>טולרנס ± (מ״מ)</label>
-<input id="tol" type="number" step="0.001" placeholder="למשל 0.010">
-<label>מס׳ בלוקים מקסימלי</label>
-<select id="max"><option>4</option><option>5</option><option selected>6</option><option>8</option></select>
+<input id="nominal" type="number" step="0.001" placeholder="לדוגמה: 27.700">
+<label>טולרנס ± (מ״מ, לא חובה)</label>
+<input id="tol" type="number" step="0.001" placeholder="לדוגמה: 0.010">
 <button id="calc" style="margin-top:10px">חשב</button>
 </div>
 
-<div id="output" class="card" style="display:none"></div>
+<div id="out" class="card" style="display:none"></div>
 
 <script>
-const BLOCKS=[1.005,1.006,1.007,1.008,1.009,1.01,1.02,1.03,1.04,1.05,1.06,1.07,1.08,1.09,
+const blocks=[1.005,1.006,1.007,1.008,1.009,1.01,1.02,1.03,1.04,1.05,1.06,1.07,1.08,1.09,
 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,25,30,40,50,60,75,100,125,150,175,200,225,250];
 
-function findFast(target,maxBlocks){
-  let remain=target,used=[];
-  for(let i=BLOCKS.length-1;i>=0&&used.length<maxBlocks;i--){
-    const b=BLOCKS[i];
-    if(remain-b>=0.001){used.push(b);remain-=b;}
-    if(remain<0.001)break;
+function getCombination(value){
+  let remain=value, selected=[];
+  for(let i=blocks.length-1;i>=0;i--){
+    if(blocks[i]<=remain+0.0005){
+      selected.push(blocks[i]);
+      remain-=blocks[i];
+      if(remain<0.001)break;
+    }
   }
-  // שיפור עדין (חיפוש בלוקים קטנים לסגירה)
-  for(let i=0;i<BLOCKS.length&&remain>0.001;i++){
-    if(BLOCKS[i]<=remain+0.0005){used.push(BLOCKS[i]);remain-=BLOCKS[i];}
-    if(remain<0.001)break;
-  }
-  return {sum:+used.reduce((a,b)=>a+b,0).toFixed(3),used,err:+(target-used.reduce((a,b)=>a+b,0)).toFixed(3)};
+  return selected;
+}
+
+function formatBlocks(arr){
+  return arr.map(b=>{
+    let label="";
+    if(b>=1) label=`${b.toFixed(0)} מ"מ`;
+    else if(b>=0.1) label=`${b.toFixed(1)} מ"מ`;
+    else label=`${b.toFixed(3)} מ"מ`;
+    return `→ ${label}`;
+  }).join("<br>");
 }
 
 document.getElementById("calc").onclick=()=>{
   const nom=parseFloat(document.getElementById("nominal").value);
-  if(isNaN(nom))return alert("הכנס מידה נומינלית");
+  if(isNaN(nom))return alert("הכנס מידה נומינלית תקפה");
   const tol=parseFloat(document.getElementById("tol").value)||0;
-  const max=parseInt(document.getElementById("max").value);
-  const resNom=findFast(nom,max);
-  const resGo=findFast(nom+tol,max);
-  const resNo=findFast(nom-tol,max);
-  const out=document.getElementById("output");
+  const out=document.getElementById("out");
+  const combo=getCombination(nom);
+  const comboGo=getCombination(nom+tol);
+  const comboNo=getCombination(nom-tol);
   out.style.display="block";
   out.innerHTML=`
-  <b>נומינל:</b> ${resNom.used.map(x=>`<span class='tag'>${x}</span>`).join(' ')}<br>Σ ${resNom.sum} מ״מ<br><br>
-  <b>GO:</b> ${resGo.used.map(x=>`<span class='tag'>${x}</span>`).join(' ')}<br>Σ ${resGo.sum} מ״מ<br><br>
-  <b>NO-GO:</b> ${resNo.used.map(x=>`<span class='tag'>${x}</span>`).join(' ')}<br>Σ ${resNo.sum} מ״מ
-  `;
+  <div class="result">
+  <b>נומינל ${nom.toFixed(3)} מ"מ:</b><br>${formatBlocks(combo)}
+  <hr>
+  <b>GO (${(nom+tol).toFixed(3)} מ"מ):</b><br>${formatBlocks(comboGo)}
+  <hr>
+  <b>NO-GO (${(nom-tol).toFixed(3)} מ"מ):</b><br>${formatBlocks(comboNo)}
+  </div>`;
 };
 </script>
 </body>
