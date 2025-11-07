@@ -1,96 +1,234 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>מחשבון דרגות טיב פני שטח – גרסה מקצועית</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>מכשירי יצור - גרסת PRO</title>
 <style>
-:root{--bg:#0b0c10;--card:#121418;--ink:#e8e8e8;--accent:#35d07f;--muted:#a7a7a7;--border:#222833;--danger:#ff4961}
-body{margin:0;font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--ink);}
-header{text-align:center;padding:20px}
-h1{margin:0;font-size:1.5rem}
-.container{max-width:840px;margin:auto;padding:16px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:0 4px 18px rgba(0,0,0,.3)}
-input,select,button{width:100%;padding:12px;border-radius:8px;border:1px solid var(--border);background:#0f1116;color:var(--ink);font-size:1rem}
-button{background:var(--accent);color:#001b0d;font-weight:bold;cursor:pointer}
-button:hover{filter:brightness(1.1)}
-.result{margin-top:20px;text-align:center;padding:20px;border-radius:12px;background:#0e141f;border:1px dashed var(--border)}
-.bigN{font-size:3.5rem;font-weight:900;color:var(--accent);margin:0}
-.range{font-size:1.1rem;margin:6px 0}
-.sub{color:var(--muted);font-size:.9rem}
-table{width:100%;border-collapse:collapse;margin-top:20px}
-th,td{text-align:center;padding:6px;border-bottom:1px solid var(--border)}
-tr.highlight{background:#102217}
+  :root {
+    --bg: #f6f6f6;
+    --card: #ffffff;
+    --text: #111;
+    --accent: #0b0c10;
+    --border: #ccc;
+    --go: #0a7f3f;
+    --nogo: #b10808;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Heebo", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    height: 100vh;
+    overflow-x: hidden;
+  }
+  .container {
+    width: 100%;
+    max-width: 400px;
+    padding: 4vw;
+  }
+  h1 {
+    text-align: center;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    font-weight: 800;
+  }
+  .input-row {
+    display: flex;
+    flex-direction: column;
+    margin: 0.5rem 0;
+  }
+  label {
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+    font-size: 0.95rem;
+  }
+  input {
+    padding: 0.6rem;
+    font-size: 1.05rem;
+    border-radius: 0.4rem;
+    border: 1px solid var(--border);
+    text-align: center;
+    direction: ltr;
+    width: 100%;
+    background: var(--card);
+  }
+  input:focus {
+    outline: 2px solid var(--accent);
+  }
+  button {
+    width: 100%;
+    padding: 0.8rem;
+    font-size: 1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 0.5rem;
+    margin-top: 0.6rem;
+    cursor: pointer;
+    transition: 0.15s;
+  }
+  .primary { background: var(--accent); color: white; }
+  .primary:hover { filter: brightness(1.2); }
+  .secondary { background: #ddd; }
+  .secondary:hover { background: #bbb; }
+
+  .resultBox, .seriesBox {
+    display: none;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+    padding: 1rem;
+    margin-top: 1rem;
+    font-family: monospace;
+    text-align: center;
+  }
+  .resultBox strong {
+    font-size: 1.1rem;
+    color: var(--accent);
+  }
+  .seriesBox {
+    max-height: 220px;
+    overflow-y: auto;
+    text-align: left;
+    direction: ltr;
+  }
+  .pin {
+    display: inline-block;
+    width: 80px;
+    padding: 0.25rem;
+    border-radius: 0.3rem;
+  }
+  .go { background: #e8f9ed; color: var(--go); font-weight: bold; }
+  .nogo { background: #fdeaea; color: var(--nogo); font-weight: bold; }
+
+  .legend {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 0.6rem;
+    font-size: 0.9rem;
+  }
+  .dot {
+    width: 0.9em; height: 0.9em; border-radius: 50%;
+    display: inline-block; margin-inline-end: 0.3em;
+  }
+  .dot.go { background: var(--go); }
+  .dot.nogo { background: var(--nogo); }
+
+  @media (max-width: 480px) {
+    .container { padding: 5vw; }
+    h1 { font-size: 1.2rem; }
+    input { font-size: 1rem; }
+  }
 </style>
 </head>
 <body>
-<header>
-<h1>מחשבון דרגת טיב פני שטח (N) – גרסה מקצועית</h1>
-<div class="sub">הקלד ערך Ra והמחשבון יקבע את דרגת N, יציג טווח מדויק וערכי Rz/Ry תואמים.</div>
-</header>
 <div class="container">
-<div class="card">
-<label>ערך Ra (חספוס ממוצע):</label>
-<input id="ra" type="number" placeholder="לדוגמה: 0.45" step="0.001" min="0">
-<label>יחידות:</label>
-<select id="unit">
-<option value="um">מיקרון (µm)</option>
-<option value="uin">מיקרו-אינטש (µin)</option>
-</select>
-<button id="calc">חשב</button>
-<div id="out" class="result">
-<p class="sub">עדיין לא הוזן ערך</p>
+  <h1>מכשירי יצור - גרסת PRO</h1>
+
+  <div class="input-row">
+    <label>NOM</label>
+    <input id="nominal" type="number" step="0.001" inputmode="decimal">
+  </div>
+
+  <div class="input-row">
+    <label>+TOL</label>
+    <input id="tolp" type="number" step="0.001" inputmode="decimal">
+  </div>
+
+  <div class="input-row">
+    <label>−TOL</label>
+    <input id="tolm" type="number" step="0.001" inputmode="decimal">
+  </div>
+
+  <button class="primary" onclick="calc()">חשב</button>
+  <button class="secondary" onclick="resetAll()">איפוס</button>
+
+  <div class="resultBox" id="resultBox"></div>
+
+  <div class="legend">
+    <span><span class="dot go"></span>Go</span>
+    <span><span class="dot nogo"></span>No-Go</span>
+  </div>
+
+  <div class="seriesBox" id="series"></div>
 </div>
-<div style="overflow:auto;max-height:350px">
-<table id="tbl">
-<thead><tr><th>דרגת N</th><th>Ra [µm]</th><th>טווח [µm]</th><th>Rz/Ry ≈ 4×Ra</th></tr></thead>
-<tbody></tbody>
-</table>
-</div>
-</div>
-</div>
+
 <script>
-const data=[
-{n:1,ra:0.025},{n:2,ra:0.05},{n:3,ra:0.1},{n:4,ra:0.2},{n:5,ra:0.4},{n:6,ra:0.8},{n:7,ra:1.6},{n:8,ra:3.2},{n:9,ra:6.3},{n:10,ra:12.5},{n:11,ra:25},{n:12,ra:50}
-];
-const UIN=39.37007874;
-function fmt(x,d=3){return Number(x).toLocaleString('he-IL',{maximumFractionDigits:d})}
-function build(){
-let tb=document.querySelector("#tbl tbody");tb.innerHTML="";
-for(let i=0;i<data.length;i++){
-let lo=i==0?0:Math.sqrt(data[i-1].ra*data[i].ra);
-let hi=i==data.length-1?Infinity:Math.sqrt(data[i].ra*data[i+1].ra);
-let tr=document.createElement("tr");
-tr.dataset.n=data[i].n;
-tr.innerHTML=`<td>N${data[i].n}</td><td>${fmt(data[i].ra)}</td><td>${fmt(lo)}–${fmt(hi)}</td><td>${fmt(data[i].ra*4)}</td>`;
-tb.appendChild(tr);
+const fmt = v => Number(v).toFixed(3);
+
+function readNum(id){
+  const el = document.getElementById(id);
+  if(!el) return NaN;
+  const raw = String(el.value).trim().replace(/,/g,'.');
+  return parseFloat(raw);
 }
+
+function blurInputs(){
+  document.querySelectorAll('input').forEach(el=>el.blur());
 }
-build();
-function classify(ra,unit){
-let ra_um=unit==="uin"?ra/UIN:ra;
-for(let g of data){if(ra_um<=g.ra+1e-12)return g;}
-return null;
+
+function calc(){
+  blurInputs();
+  const nom = readNum('nominal');
+  const tp  = readNum('tolp');
+  const tm  = readNum('tolm');
+  const resultBox = document.getElementById('resultBox');
+  const seriesBox = document.getElementById('series');
+
+  seriesBox.style.display = 'none';
+  resultBox.style.display = 'none';
+
+  if(isNaN(nom)){
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = 'יש להזין ערך נומינלי תקין';
+    return;
+  }
+
+  const up = isNaN(tp)?0:tp;
+  const lo = isNaN(tm)?0:tm;
+
+  const max = nom + up;
+  const min = nom - lo;
+
+  resultBox.innerHTML =
+    `<strong>תוצאה:</strong><br><b>${fmt(max)}</b> ⇐ קדח ⇒ <b>${fmt(min)}</b>`;
+  resultBox.style.display = 'block';
+
+  const step = 0.01;
+  const start = Math.ceil(min * 100) / 100;
+  const end   = Math.floor(max * 100) / 100;
+
+  if(start > end){
+    seriesBox.innerHTML = 'אין פינים בתחום זה';
+  } else {
+    let html = '';
+    for(let i = Math.round(start*100); i <= Math.round(end*100); i++){
+      const v = i / 100;
+      const val = fmt(v);
+      if(i === Math.round(start*100))
+        html += `<div class="pin go">${val} <b>Go</b></div>`;
+      else if(i === Math.round(end*100))
+        html += `<div class="pin nogo">${val} <b>No-Go</b></div>`;
+      else
+        html += `<div class="pin">${val}</div>`;
+    }
+    seriesBox.innerHTML = html;
+  }
+
+  seriesBox.style.display = 'block';
 }
-document.getElementById("calc").onclick=()=>{
-let val=parseFloat(document.getElementById("ra").value);
-if(!val||val<=0)return alert("אנא הזן ערך חוקי");
-let unit=document.getElementById("unit").value;
-let ra_um=unit==="uin"?val/UIN:val;
-let g=classify(val,unit);
-let out=document.getElementById("out");
-document.querySelectorAll("tr").forEach(r=>r.classList.remove("highlight"));
-if(!g){out.innerHTML="<p style='color:var(--danger)'>הערך מחוץ לטווח (גדול מ‑N12)</p>";return;}
-let i=data.findIndex(x=>x.n===g.n);
-let lo=i==0?0:Math.sqrt(data[i-1].ra*data[i].ra);
-let hi=i==data.length-1?Infinity:Math.sqrt(data[i].ra*data[i+1].ra);
-document.querySelector(`tr[data-n='${g.n}']`).classList.add("highlight");
-let rz=g.ra*4;
-out.innerHTML=`<p class="bigN">N${g.n}</p>
-<p class="range">Ra = ${fmt(ra_um)} µm</p>
-<p class="range">טווח דרגה: ${fmt(lo)} – ${Number.isFinite(hi)?fmt(hi):"∞"} µm</p>
-<p class="range">Rz / Ry ≈ ${fmt(rz)} µm</p>`;
-};
+
+function resetAll(){
+  document.querySelectorAll('input').forEach(el=>el.value='');
+  document.getElementById('resultBox').style.display='none';
+  document.getElementById('series').style.display='none';
+}
 </script>
 </body>
 </html>
