@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>מחשבון מידה לפני צבע</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    .wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .card {
+      background-color: #111111;
+      border-radius: 14px;
+      padding: 18px 16px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.6);
+    }
+
+    .title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.82rem;
+      text-align: center;
+      color: #bbbbbb;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      margin-bottom: 12px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+    }
+
+    .field input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #333333;
+      background-color: #1b1b1b;
+      color: #ffffff;
+      font-size: 0.95rem;
+    }
+
+    .field input[type="number"]:focus {
+      outline: none;
+      border-color: #00c3ff;
+      box-shadow: 0 0 0 1px #00c3ff33;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      margin-top: 4px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #00c3ff, #0077ff);
+      color: #ffffff;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .results {
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 1px solid #333333;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 6px;
+      font-size: 0.92rem;
+    }
+
+    .result-label {
+      color: #cccccc;
+    }
+
+    .result-value {
+      font-weight: bold;
+      font-family: "Courier New", monospace;
+    }
+
+    .result-main {
+      font-size: 1rem;
+      color: #00e676;
+    }
+
+    .note {
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: #888888;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="card">
+      <div class="title">מחשבון מידה לפני צבע</div>
+      <div class="subtitle">מחשב עובי צבע כפול 2 ומידת עיבוד לפני צבע</div>
+
+      <div class="field">
+        <label for="paint">עובי צבע נדרש (מ״מ)</label>
+        <input id="paint" type="number" step="0.001" placeholder="לדוגמה: 0.008">
+      </div>
+
+      <div class="field">
+        <label for="drawing">מידה בשרטוט (מ״מ)</label>
+        <input id="drawing" type="number" step="0.001" placeholder="לדוגמה: 20.000">
+      </div>
+
+      <button class="btn" onclick="calculate()">חשב</button>
+
+      <div class="results">
+        <div class="result-row">
+          <div class="result-label">עובי צבע כפול 2 (מ״מ):</div>
+          <div class="result-value" id="paint2">—</div>
+        </div>
+        <div class="result-row">
+          <div class="result-label">מידה לעיבוד לפני צבע (מ״מ):</div>
+          <div class="result-value result-main" id="finalDim">—</div>
+        </div>
+      </div>
+
+      <div class="note">
+        החישוב: מידה לפני צבע = מידה בשרטוט − (עובי צבע × 2)
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function formatNumber(value) {
+      if (isNaN(value)) return "—";
+      return value.toFixed(3);
+    }
+
+    function calculate() {
+      const paintInput = document.getElementById("paint").value.replace(",", ".");
+      const drawingInput = document.getElementById("drawing").value.replace(",", ".");
+
+      const paint = parseFloat(paintInput);
+      const drawing = parseFloat(drawingInput);
+
+      const paint2El = document.getElementById("paint2");
+      const finalDimEl = document.getElementById("finalDim");
+
+      if (isNaN(paint) || isNaN(drawing)) {
+        paint2El.textContent = "—";
+        finalDimEl.textContent = "—";
+        return;
+      }
+
+      const paint2 = paint * 2;
+      const finalDim = drawing - paint2;
+
+      paint2El.textContent = formatNumber(paint2);
+      finalDimEl.textContent = formatNumber(finalDim);
+    }
+  </script>
+</body>
+</html>
