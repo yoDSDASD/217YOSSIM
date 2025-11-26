@@ -7,7 +7,7 @@
   <style>
     * {
       box-sizing: border-box;
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     }
 
     html, body {
@@ -17,113 +17,166 @@
       color: #ffffff;
     }
 
-    .wrapper {
+    body {
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+    }
+
+    .wrapper {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 12px 12px 24px;
     }
 
     .card {
       background-color: #111111;
-      border-radius: 14px;
-      padding: 18px 16px;
-      width: 100%;
-      max-width: 420px;
-      box-shadow: 0 0 12px rgba(0,0,0,0.6);
+      border-radius: 16px;
+      padding: 14px 12px 16px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.7);
     }
 
     .title {
       font-size: 1.2rem;
-      font-weight: bold;
+      font-weight: 700;
       text-align: center;
       margin-bottom: 4px;
     }
 
     .subtitle {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       text-align: center;
       color: #bbbbbb;
-      margin-bottom: 16px;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      margin-top: 8px;
+      margin-bottom: 4px;
+      font-size: 0.82rem;
+      color: #dddddd;
+      font-weight: 600;
+      border-bottom: 1px solid #222222;
+      padding-bottom: 2px;
     }
 
     .field {
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .field label {
       display: block;
-      font-size: 0.9rem;
-      margin-bottom: 4px;
+      font-size: 0.8rem;
+      margin-bottom: 3px;
     }
 
     .field input[type="number"] {
       width: 100%;
-      padding: 10px;
-      border-radius: 8px;
+      padding: 8px 9px;
+      border-radius: 10px;
       border: 1px solid #333333;
       background-color: #1b1b1b;
       color: #ffffff;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+    }
+
+    .field input[type="number"]::placeholder {
+      color: #666666;
+      font-size: 0.78rem;
     }
 
     .field input[type="number"]:focus {
       outline: none;
-      border-color: #00c3ff;
-      box-shadow: 0 0 0 1px #00c3ff33;
+      border-color: #00b4ff;
+      box-shadow: 0 0 0 1px #00b4ff33;
+    }
+
+    .row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .row .field {
+      flex: 1;
+      margin-bottom: 8px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 6px;
+      margin-top: 4px;
     }
 
     .btn {
-      width: 100%;
-      padding: 10px;
-      margin-top: 4px;
+      flex: 1;
+      padding: 9px 0;
       border: none;
-      border-radius: 10px;
-      background: linear-gradient(135deg, #00c3ff, #0077ff);
-      color: #ffffff;
-      font-size: 1rem;
-      font-weight: bold;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-weight: 600;
       cursor: pointer;
     }
 
+    .btn-main {
+      background: linear-gradient(135deg, #00c3ff, #0077ff);
+      color: #ffffff;
+    }
+
+    .btn-secondary {
+      background-color: #222222;
+      color: #dddddd;
+    }
+
     .btn:active {
-      transform: scale(0.98);
+      transform: scale(0.97);
     }
 
     .results {
-      margin-top: 14px;
-      padding-top: 10px;
-      border-top: 1px solid #333333;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 12px;
+      background-color: #181818;
+      border: 1px solid #262626;
+    }
+
+    .results-block {
+      margin-bottom: 8px;
+    }
+
+    .results-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #cccccc;
     }
 
     .result-row {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 6px;
-      font-size: 0.92rem;
+      margin-bottom: 3px;
+      font-size: 0.82rem;
     }
 
     .result-label {
-      color: #cccccc;
+      color: #bbbbbb;
     }
 
     .result-value {
-      font-weight: bold;
-      font-family: "Courier New", monospace;
+      font-weight: 700;
+      font-family: "SF Mono", "Courier New", monospace;
+      font-size: 0.9rem;
     }
 
     .result-main {
-      font-size: 1rem;
       color: #00e676;
+      font-size: 0.95rem;
     }
 
     .note {
       margin-top: 6px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #888888;
       text-align: center;
+      line-height: 1.3;
     }
   </style>
 </head>
@@ -131,56 +184,97 @@
   <div class="wrapper">
     <div class="card">
       <div class="title">מחשבון מידה לפני צבע</div>
-      <div class="subtitle">מחשב עובי צבע כפול 2 ומידת עיבוד לפני צבע</div>
+      <div class="subtitle">עובי צבע × 2 ומידת עיבוד לפני צבע</div>
+
+      <div class="section-title">קלט</div>
 
       <div class="field">
         <label for="paint">עובי צבע נדרש (מ״מ)</label>
-        <input id="paint" type="number" step="0.001" placeholder="לדוגמה: 0.008">
+        <input id="paint" type="number" step="0.001" inputmode="decimal" placeholder="לדוגמה: 0.008">
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label for="tolMinus">טלורנס מינוס (מ״מ) – אופציונלי</label>
+          <input id="tolMinus" type="number" step="0.001" inputmode="decimal" placeholder="לדוגמה: 0.002">
+        </div>
+        <div class="field">
+          <label for="tolPlus">טלורנס פלוס (מ״מ) – אופציונלי</label>
+          <input id="tolPlus" type="number" step="0.001" inputmode="decimal" placeholder="לדוגמה: 0.002">
+        </div>
       </div>
 
       <div class="field">
-        <label for="drawing">מידה בשרטוט (מ״מ)</label>
-        <input id="drawing" type="number" step="0.001" placeholder="לדוגמה: 20.000">
+        <label for="drawing">מידה בשרטוט אחרי צבע (מ״מ)</label>
+        <input id="drawing" type="number" step="0.001" inputmode="decimal" placeholder="לדוגמה: 20.000">
       </div>
 
-      <button class="btn" onclick="calculate()">חשב</button>
+      <div class="buttons">
+        <button class="btn btn-main" onclick="calculate()">חשב</button>
+        <button class="btn btn-secondary" onclick="clearAll()">נקה</button>
+      </div>
 
       <div class="results">
-        <div class="result-row">
-          <div class="result-label">עובי צבע כפול 2 (מ״מ):</div>
-          <div class="result-value" id="paint2">—</div>
+        <div class="results-block">
+          <div class="results-title">תוצאה נומינלית</div>
+          <div class="result-row">
+            <div class="result-label">עובי צבע × 2 (מ״מ):</div>
+            <div class="result-value" id="paint2">—</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">מידה לעיבוד לפני צבע (מ״מ):</div>
+            <div class="result-value result-main" id="finalDim">—</div>
+          </div>
         </div>
-        <div class="result-row">
-          <div class="result-label">מידה לעיבוד לפני צבע (מ״מ):</div>
-          <div class="result-value result-main" id="finalDim">—</div>
+
+        <div class="results-block" id="tolBlock" style="display:none;">
+          <div class="results-title">טווח לפי טלורנס צבע</div>
+          <div class="result-row">
+            <div class="result-label">עובי צבע מינ׳ / מק׳ (מ״מ):</div>
+            <div class="result-value" id="paintRange">—</div>
+          </div>
+          <div class="result-row">
+            <div class="result-label">מידת עיבוד מינ׳ / מק׳ (מ״מ):</div>
+            <div class="result-value" id="dimRange">—</div>
+          </div>
         </div>
       </div>
 
       <div class="note">
-        החישוב: מידה לפני צבע = מידה בשרטוט − (עובי צבע × 2)
+        נוסחה בסיסית: מידה לפני צבע = מידה בשרטוט − (עובי צבע × 2)<br>
+        בטלורנס: מחושב טווח לפי עובי צבע מינימלי ומקסימלי.
       </div>
     </div>
   </div>
 
   <script>
-    function formatNumber(value) {
-      if (isNaN(value)) return "—";
-      return value.toFixed(3);
+    function parseNum(id) {
+      const raw = document.getElementById(id).value.replace(",", ".");
+      const v = parseFloat(raw);
+      return isNaN(v) ? null : v;
+    }
+
+    function formatNumber(v) {
+      if (v === null || isNaN(v)) return "—";
+      return v.toFixed(3);
     }
 
     function calculate() {
-      const paintInput = document.getElementById("paint").value.replace(",", ".");
-      const drawingInput = document.getElementById("drawing").value.replace(",", ".");
-
-      const paint = parseFloat(paintInput);
-      const drawing = parseFloat(drawingInput);
+      const paint = parseNum("paint");
+      const tolMinus = parseNum("tolMinus");
+      const tolPlus = parseNum("tolPlus");
+      const drawing = parseNum("drawing");
 
       const paint2El = document.getElementById("paint2");
       const finalDimEl = document.getElementById("finalDim");
+      const tolBlock = document.getElementById("tolBlock");
+      const paintRangeEl = document.getElementById("paintRange");
+      const dimRangeEl = document.getElementById("dimRange");
 
-      if (isNaN(paint) || isNaN(drawing)) {
+      if (paint === null || drawing === null) {
         paint2El.textContent = "—";
         finalDimEl.textContent = "—";
+        tolBlock.style.display = "none";
         return;
       }
 
@@ -189,7 +283,45 @@
 
       paint2El.textContent = formatNumber(paint2);
       finalDimEl.textContent = formatNumber(finalDim);
+
+      const hasTol = tolMinus !== null || tolPlus !== null;
+      if (!hasTol) {
+        tolBlock.style.display = "none";
+        return;
+      }
+
+      const minPaint = tolMinus !== null ? (paint - tolMinus) : paint;
+      const maxPaint = tolPlus  !== null ? (paint + tolPlus)  : paint;
+
+      const minPaint2 = minPaint * 2;
+      const maxPaint2 = maxPaint * 2;
+
+      const minPre = drawing - maxPaint2; // הכי הרבה צבע → הכי פחות חומר
+      const maxPre = drawing - minPaint2; // הכי מעט צבע → הכי הרבה חומר
+
+      paintRangeEl.textContent = formatNumber(minPaint) + " / " + formatNumber(maxPaint);
+      dimRangeEl.textContent   = formatNumber(minPre)  + " / " + formatNumber(maxPre);
+
+      tolBlock.style.display = "block";
     }
+
+    function clearAll() {
+      ["paint","tolMinus","tolPlus","drawing"].forEach(id => {
+        document.getElementById(id).value = "";
+      });
+      document.getElementById("paint2").textContent = "—";
+      document.getElementById("finalDim").textContent = "—";
+      document.getElementById("tolBlock").style.display = "none";
+    }
+
+    ["paint","tolMinus","tolPlus","drawing"].forEach(id => {
+      document.getElementById(id).addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          calculate();
+        }
+      });
+    });
   </script>
 </body>
 </html>
