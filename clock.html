@@ -3,59 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WorkTime Premium</title>
+    <title>WorkTime PRO</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
         :root { --bg: #000; --card: #111; --accent: #007aff; --text: #fff; --border: #222; --success: #34c759; --danger: #ff3b30; }
-        * { box-sizing: border-box; font-family: -apple-system, system-ui; transition: 0.2s; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 450px; }
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 12px; }
-        .timer { font-size: 4.5rem; font-weight: 200; text-align: center; margin: 10px 0; font-variant-numeric: tabular-nums; }
-        .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
-        .btn-main { background: var(--text); color: #000; }
+        * { box-sizing: border-box; font-family: system-ui; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; width: 100%; max-width: 400px; margin-bottom: 15px; }
+        .timer { font-size: 4rem; text-align: center; margin: 15px 0; font-variant-numeric: tabular-nums; font-weight: 200; }
+        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; margin-top: 10px; font-size: 1rem; }
+        .btn-start { background: #fff; color: #000; }
         .btn-stop { background: var(--danger); color: #fff; }
-        table { width: 100%; border-collapse: collapse; }
-        td, th { padding: 12px 8px; border-bottom: 1px solid var(--border); text-align: right; font-size: 0.9rem; }
-        input { background: #1c1c1e; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; width: 100%; outline: none; }
-        #loginOverlay { position:fixed; inset:0; background:#000; z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+        .btn-save { background: var(--accent); color: #fff; padding: 10px; font-size: 0.9rem; }
+        table { width: 100%; margin-top: 15px; border-collapse: collapse; }
+        td, th { padding: 10px; border-bottom: 1px solid var(--border); text-align: right; font-size: 0.9rem; }
+        input { background: #1c1c1e; border: 1px solid var(--border); color: #fff; padding: 10px; border-radius: 8px; width: 100%; text-align: center; }
+        #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
-    <h1 style="font-weight:200">WorkTime PRO</h1>
-    <button onclick="login()" class="btn btn-main" style="width:auto; padding:15px 50px">התחבר עם Google</button>
+    <button onclick="login()" class="btn btn-start" style="width:auto; padding: 15px 40px;">התחבר עם Google</button>
 </div>
 
-<div class="container">
-    <div class="card" style="text-align:center">
-        <div id="currentDay" style="color:var(--accent); font-weight:700; font-size:1.2rem; margin-bottom:5px"></div>
-        <div id="greeting" style="opacity:0.6; font-size:0.9rem">טוען...</div>
-        <div class="timer" id="display">00:00:00</div>
-        <button id="shiftBtn" class="btn btn-main" onclick="toggleShift()">כניסה למשמרת</button>
-    </div>
+<div class="card">
+    <div id="dayDisplay" style="color:var(--accent); font-weight:700; text-align:center;"></div>
+    <div class="timer" id="display">00:00:00</div>
+    <button id="shiftBtn" class="btn btn-start" onclick="toggleShift()">כניסה למשמרת</button>
+</div>
 
-    <div class="card">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div><label style="font-size:0.7rem">₪ לשעה</label><input type="number" id="rate"></div>
-            <div><label style="font-size:0.7rem">תקן יומי</label><input type="number" id="std"></div>
-        </div>
-        <button class="btn" style="background:var(--accent); color:#fff; margin-top:10px; font-size:0.9rem; padding:10px" onclick="updateSettings()">שמור הגדרות</button>
+<div class="card">
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div><label style="font-size:0.7rem">₪/שעה</label><input type="number" id="rate"></div>
+        <div><label style="font-size:0.7rem">תקן יומי</label><input type="number" id="std"></div>
     </div>
+    <button class="btn btn-save" onclick="updateSettings()">שמור הגדרות</button>
+</div>
 
-    <div class="card" style="padding:10px">
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px">
-            <span style="font-weight:700">דוח חודשי</span>
-            <button onclick="manualAdd()" style="background:none; border:none; color:var(--accent); font-weight:600; cursor:pointer">+ הוספה ידנית</button>
-        </div>
-        <table>
-            <tbody id="logBody"></tbody>
-        </table>
-        <div style="padding:15px; text-align:left; font-size:1.2rem; font-weight:700">סה"כ: <span id="totalPay" style="color:var(--success)">₪0</span></div>
+<div class="card">
+    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <b>דוח חודשי</b>
+        <span onclick="manualAdd()" style="color:var(--accent); cursor:pointer; font-size:0.9rem;">+ הוספה ידנית</span>
     </div>
+    <table>
+        <tbody id="logBody"></tbody>
+    </table>
+    <div style="margin-top:15px; font-weight:bold; font-size:1.2rem;">סה"כ: <span id="totalPay" style="color:var(--success)">₪0</span></div>
 </div>
 
 <script>
@@ -65,7 +61,7 @@
     let user = null; let timerInt;
 
     const days = ["יום ראשון", "יום שני", "יום שלישי", "יום רביעי", "יום חמישי", "יום שישי", "שבת"];
-    document.getElementById('currentDay').innerText = days[new Date().getDay()];
+    document.getElementById('dayDisplay').innerText = days[new Date().getDay()];
 
     async function login() { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
@@ -73,7 +69,6 @@
         if(u) {
             user = u;
             document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('greeting').innerText = `שלום, ${u.displayName.split(' ')[0]}`;
             await loadSettings();
             loadData();
             checkActive();
@@ -81,11 +76,8 @@
     });
 
     async function updateSettings() {
-        await db.collection('users').doc(user.uid).set({
-            rate: document.getElementById('rate').value,
-            std: document.getElementById('std').value
-        }, { merge: true });
-        alert("הגדרות נשמרו בהצלחה!");
+        await db.collection('users').doc(user.uid).set({ rate: document.getElementById('rate').value, std: document.getElementById('std').value }, { merge: true });
+        alert("נשמר!");
     }
 
     async function loadSettings() {
@@ -95,16 +87,16 @@
         document.getElementById('std').value = d.std;
     }
 
-    function toggleShift() {
+    async function toggleShift() {
         const start = localStorage.getItem('active_start');
         if(!start) {
             localStorage.setItem('active_start', new Date().toISOString());
             checkActive();
         } else {
             const hours = (new Date() - new Date(start)) / 3600000;
-            saveToDB(new Date().toISOString().split('T')[0], hours);
+            await saveToDB(new Date().toISOString().split('T')[0], hours);
             localStorage.removeItem('active_start');
-            setTimeout(() => location.reload(), 500);
+            location.reload();
         }
     }
 
@@ -113,12 +105,11 @@
         const std = parseFloat(document.getElementById('std').value) || 9.5;
         const isThur = new Date(dateStr).getDay() === 4;
         const currentStd = isThur ? std - 1 : std;
-        let pay = hours <= currentStd ? hours * rate : (currentStd * rate) + ((hours - currentStd) * rate * 1.25);
+        const pay = hours <= currentStd ? hours * rate : (currentStd * rate) + ((hours - currentStd) * rate * 1.25);
         
         await db.collection('users').doc(user.uid).collection('logs').add({
-            date: dateStr, hours: parseFloat(hours.toFixed(2)), pay: Math.round(pay), timestamp: Date.now()
+            date: dateStr, hours: hours.toFixed(2), pay: Math.round(pay), timestamp: Date.now()
         });
-        loadData();
     }
 
     async function loadData() {
@@ -126,17 +117,16 @@
         let total = 0;
         document.getElementById('logBody').innerHTML = snap.docs.map(doc => {
             const d = doc.data(); total += d.pay;
-            const date = d.date.split('-').reverse().slice(0,2).join('/');
-            return `<tr><td>${date}</td><td>${d.hours} ש'</td><td>₪${d.pay}</td><td onclick="deleteLog('${doc.id}')">🗑️</td></tr>`;
+            return `<tr><td>${d.date.split('-').reverse().slice(0,2).join('/')}</td><td>${d.hours} ש'</td><td>₪${d.pay}</td><td onclick="deleteLog('${doc.id}')">🗑️</td></tr>`;
         }).join('');
         document.getElementById('totalPay').innerText = `₪${total.toLocaleString()}`;
     }
 
     async function deleteLog(id) { if(confirm('למחוק?')) { await db.collection('users').doc(user.uid).collection('logs').doc(id).delete(); loadData(); } }
 
-    function manualAdd() {
+    async function manualAdd() {
         const h = prompt("כמה שעות עבדת?");
-        if(h) saveToDB(new Date().toISOString().split('T')[0], parseFloat(h));
+        if(h) { await saveToDB(new Date().toISOString().split('T')[0], parseFloat(h)); loadData(); }
     }
 
     function checkActive() {
