@@ -9,22 +9,17 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
         :root { --bg: #000; --card: #111; --accent: #007aff; --text: #fff; --border: #222; --success: #34c759; --danger: #ff3b30; }
-        * { box-sizing: border-box; font-family: -apple-system, system-ui; transition: 0.2s ease; }
+        * { box-sizing: border-box; font-family: -apple-system, system-ui; transition: 0.2s; }
         body { background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
         .container { width: 100%; max-width: 450px; }
         .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 20px; margin-bottom: 12px; }
-        .timer { font-size: 4rem; font-weight: 200; text-align: center; margin: 15px 0; font-variant-numeric: tabular-nums; }
+        .timer { font-size: 4.5rem; font-weight: 200; text-align: center; margin: 10px 0; font-variant-numeric: tabular-nums; }
         .btn { width: 100%; padding: 16px; border-radius: 14px; border: none; font-size: 1.1rem; font-weight: 600; cursor: pointer; }
         .btn-main { background: var(--text); color: #000; }
         .btn-stop { background: var(--danger); color: #fff; }
-        .btn-save { background: var(--accent); color: #fff; margin-top: 10px; font-size: 0.9rem; padding: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { color: #666; font-size: 0.8rem; text-align: right; padding: 8px; border-bottom: 1px solid var(--border); }
-        td { padding: 12px 8px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-        .input-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        td, th { padding: 12px 8px; border-bottom: 1px solid var(--border); text-align: right; font-size: 0.9rem; }
         input { background: #1c1c1e; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 10px; width: 100%; outline: none; }
-        input:focus { border-color: var(--accent); }
-        .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:100; align-items:center; justify-content:center; padding:20px; }
         #loginOverlay { position:fixed; inset:0; background:#000; z-index:200; display:flex; flex-direction:column; align-items:center; justify-content:center; }
     </style>
 </head>
@@ -35,43 +30,28 @@
     <button onclick="login()" class="btn btn-main" style="width:auto; padding:15px 50px">התחבר עם Google</button>
 </div>
 
-<div id="manualModal" class="modal">
-    <div class="card" style="width:100%">
-        <h3>הוספה ידנית</h3>
-        <label>תאריך</label><input type="date" id="mDate" style="margin-bottom:10px">
-        <div class="input-group">
-            <div><label>כניסה</label><input type="time" id="mIn"></div>
-            <div><label>יציאה</label><input type="time" id="mOut"></div>
-        </div>
-        <div class="input-group" style="margin-top:20px">
-            <button class="btn btn-main" onclick="submitManual()">שמור</button>
-            <button class="btn" style="background:#333; color:#fff" onclick="document.getElementById('manualModal').style.display='none'">ביטול</button>
-        </div>
-    </div>
-</div>
-
 <div class="container">
-    <div class="card">
+    <div class="card" style="text-align:center">
+        <div id="currentDay" style="color:var(--accent); font-weight:700; font-size:1.2rem; margin-bottom:5px"></div>
         <div id="greeting" style="opacity:0.6; font-size:0.9rem">טוען...</div>
         <div class="timer" id="display">00:00:00</div>
         <button id="shiftBtn" class="btn btn-main" onclick="toggleShift()">כניסה למשמרת</button>
     </div>
 
     <div class="card">
-        <div class="input-group">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
             <div><label style="font-size:0.7rem">₪ לשעה</label><input type="number" id="rate"></div>
             <div><label style="font-size:0.7rem">תקן יומי</label><input type="number" id="std"></div>
         </div>
-        <button class="btn btn-save" onclick="updateSettings()">שמור הגדרות כסף</button>
+        <button class="btn" style="background:var(--accent); color:#fff; margin-top:10px; font-size:0.9rem; padding:10px" onclick="updateSettings()">שמור הגדרות</button>
     </div>
 
     <div class="card" style="padding:10px">
         <div style="display:flex; justify-content:space-between; align-items:center; padding:10px">
-            <span style="font-weight:700">דוח נוכחות</span>
-            <button onclick="document.getElementById('manualModal').style.display='flex'" style="background:none; border:none; color:var(--accent); font-weight:600; cursor:pointer">+ הוספה ידנית</button>
+            <span style="font-weight:700">דוח חודשי</span>
+            <button onclick="manualAdd()" style="background:none; border:none; color:var(--accent); font-weight:600; cursor:pointer">+ הוספה ידנית</button>
         </div>
         <table>
-            <thead><tr><th>תאריך</th><th>שעות</th><th>שכר</th><th></th></tr></thead>
             <tbody id="logBody"></tbody>
         </table>
         <div style="padding:15px; text-align:left; font-size:1.2rem; font-weight:700">סה"כ: <span id="totalPay" style="color:var(--success)">₪0</span></div>
@@ -83,6 +63,9 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth(); const db = firebase.firestore();
     let user = null; let timerInt;
+
+    const days = ["יום ראשון", "יום שני", "יום שלישי", "יום רביעי", "יום חמישי", "יום שישי", "שבת"];
+    document.getElementById('currentDay').innerText = days[new Date().getDay()];
 
     async function login() { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
@@ -102,8 +85,7 @@
             rate: document.getElementById('rate').value,
             std: document.getElementById('std').value
         }, { merge: true });
-        alert("הגדרות נשמרו!");
-        loadData();
+        alert("הגדרות נשמרו בהצלחה!");
     }
 
     async function loadSettings() {
@@ -122,32 +104,19 @@
             const hours = (new Date() - new Date(start)) / 3600000;
             saveToDB(new Date().toISOString().split('T')[0], hours);
             localStorage.removeItem('active_start');
-            location.reload();
+            setTimeout(() => location.reload(), 500);
         }
     }
 
-    async function submitManual() {
-        const d = document.getElementById('mDate').value;
-        const tin = document.getElementById('mIn').value;
-        const tout = document.getElementById('mOut').value;
-        if(!d || !tin || !tout) return;
-        const start = new Date(d + 'T' + tin);
-        const end = new Date(d + 'T' + tout);
-        const hours = (end - start) / 3600000;
-        if(hours <= 0) return alert("שעת יציאה חייבת להיות אחרי כניסה");
-        await saveToDB(d, hours);
-        document.getElementById('manualModal').style.display = 'none';
-    }
-
     async function saveToDB(dateStr, hours) {
-        const rate = parseFloat(document.getElementById('rate').value);
-        const std = parseFloat(document.getElementById('std').value);
-        const day = new Date(dateStr).getDay();
-        const currentStd = (day === 4) ? std - 1 : std;
+        const rate = parseFloat(document.getElementById('rate').value) || 50;
+        const std = parseFloat(document.getElementById('std').value) || 9.5;
+        const isThur = new Date(dateStr).getDay() === 4;
+        const currentStd = isThur ? std - 1 : std;
         let pay = hours <= currentStd ? hours * rate : (currentStd * rate) + ((hours - currentStd) * rate * 1.25);
         
         await db.collection('users').doc(user.uid).collection('logs').add({
-            date: dateStr, hours: parseFloat(hours.toFixed(2)), pay: Math.round(pay), timestamp: new Date(dateStr).getTime()
+            date: dateStr, hours: parseFloat(hours.toFixed(2)), pay: Math.round(pay), timestamp: Date.now()
         });
         loadData();
     }
@@ -156,16 +125,19 @@
         const snap = await db.collection('users').doc(user.uid).collection('logs').orderBy('timestamp', 'desc').get();
         let total = 0;
         document.getElementById('logBody').innerHTML = snap.docs.map(doc => {
-            const d = doc.data();
-            total += d.pay;
-            const dateArr = d.date.split('-');
-            const displayDate = `${dateArr[2]}/${dateArr[1]}`;
-            return `<tr><td>${displayDate}</td><td>${d.hours} ש'</td><td>₪${d.pay}</td><td><span style="cursor:pointer" onclick="deleteLog('${doc.id}')">🗑️</span></td></tr>`;
+            const d = doc.data(); total += d.pay;
+            const date = d.date.split('-').reverse().slice(0,2).join('/');
+            return `<tr><td>${date}</td><td>${d.hours} ש'</td><td>₪${d.pay}</td><td onclick="deleteLog('${doc.id}')">🗑️</td></tr>`;
         }).join('');
         document.getElementById('totalPay').innerText = `₪${total.toLocaleString()}`;
     }
 
     async function deleteLog(id) { if(confirm('למחוק?')) { await db.collection('users').doc(user.uid).collection('logs').doc(id).delete(); loadData(); } }
+
+    function manualAdd() {
+        const h = prompt("כמה שעות עבדת?");
+        if(h) saveToDB(new Date().toISOString().split('T')[0], parseFloat(h));
+    }
 
     function checkActive() {
         const start = localStorage.getItem('active_start');
@@ -174,7 +146,10 @@
             document.getElementById('shiftBtn').className = "btn btn-stop";
             timerInt = setInterval(() => {
                 const s = Math.floor((new Date() - new Date(start)) / 1000);
-                document.getElementById('display').innerText = new Date(s * 1000).toISOString().substr(11, 8);
+                const h = Math.floor(s/3600).toString().padStart(2,'0');
+                const m = Math.floor((s%3600)/60).toString().padStart(2,'0');
+                const sec = (s%60).toString().padStart(2,'0');
+                document.getElementById('display').innerText = `${h}:${m}:${sec}`;
             }, 1000);
         }
     }
