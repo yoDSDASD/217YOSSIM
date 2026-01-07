@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkTime ULTIMATE PRO</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        :root { --primary: #3498db; --success: #27ae60; --danger: #e74c3c; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        body { font-family: system-ui; background: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card); padding: 20px; border-radius: 20px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); border-top: 4px solid var(--primary); }
+        .timer { font-size: 3.5rem; font-weight: 800; color: var(--danger); margin: 10px 0; font-family: monospace; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .stat-box { background: #334155; padding: 10px; border-radius: 10px; font-size: 0.8rem; }
+        input { background: #0f172a; color: white; border: 1px solid #334155; padding: 5px; border-radius: 5px; width: 50px; text-align: center; }
+        button { padding: 12px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; transition: 0.2s; margin: 5px; }
+        .btn-google { background: white; color: #444; width: 100%; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-in { background: var(--success); color: white; width: 45%; }
+        .btn-out { background: var(--danger); color: white; width: 45%; }
+        .btn-util { background: var(--primary); color: white; width: 100%; }
+        table { width: 100%; max-width: 450px; margin-top: 20px; border-collapse: collapse; font-size: 0.75rem; background: var(--card); border-radius: 10px; overflow: hidden; }
+        th, td { padding: 10px; border-bottom: 1px solid #334155; text-align: center; }
+        .chart-container { width: 100%; max-width: 450px; margin-top: 15px; background: var(--card); padding: 10px; border-radius: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <button class="btn-google" id="loginBtn" onclick="login()">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_Reference_Icon.svg" width="20"> התחבר עם Google
+    </button>
+    <h3 id="userName">שלום, אורח</h3>
+    
+    <div class="stats-grid">
+        <div class="stat-box">₪/שעה: <input type="number" id="hourlyRate" value="50" onchange="saveConfig()"></div>
+        <div class="stat-box">תקן יומי: <input type="number" id="quota" value="9" onchange="saveConfig()"></div>
+    </div>
+
+    <div id="status">במנוחה</div>
+    <div class="timer" id="countdown">00:00:00</div>
+    
+    <div style="display: flex; justify-content: center;">
+        <button class="btn-in" onclick="punchIn()">▶️ כניסה</button>
+        <button class="btn-out" onclick="punchOut()">⏹️ יציאה</button>
+    </div>
+    <button class="btn-util" onclick="exportPDF()">📄 הורד דו"ח PDF חודשי</button>
+</div>
+
+<div class="chart-container"><canvas id="workChart"></canvas></div>
+
+<table id="reportTable">
+    <thead><tr><th>תאריך</th><th>סה"כ</th><th>שכר</th><th></th></tr></thead>
+    <tbody id="logBody"></tbody>
+</table>
+
+<script>
+    // Firebase Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyB6k04PIDrtH0lN1mMH8d4mrQbU_Wd6EPY",
+        authDomain: "clooc-87768.firebaseapp.com",
+        projectId: "clooc-87768",
+        storageBucket: "clooc-87768.firebasestorage.app",
+        messagingSenderId: "446568496274",
+        appId: "1:446568496274:web:c1aead85e32d21d0e5ba4b"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    let currentUser = null;
+
+    // Notifications API
+    if ("Notification" in window) Notification.requestPermission();
+
+    function sendNotify(title, body) {
+        if (Notification.permission === "granted") new Notification(title, { body });
+    }
+
+    async function login() {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await auth.signInWithPopup(provider);
+    }
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            currentUser = user;
+            document.getElementById('userName').innerText = `שלום, ${user.displayName}`;
+            document.getElementById('loginBtn').style.display = 'none';
+            loadData();
+        }
+    });
+
+    function punchIn() {
+        const startTime = new Date();
+        localStorage.setItem('active_start', startTime);
+        sendNotify("משמרת החלה", "השעון התחיל לרוץ!");
+        location.reload();
+    }
+
+    async function punchOut() {
+        const startStr = localStorage.getItem('active_start');
+        if(!startStr) return;
+        
+        const start = new Date(startStr);
+        const end = new Date();
+        const diffHours = (end - start) / 3600000;
+        
+        const rate = parseFloat(document.getElementById('hourlyRate').value);
+        const quota = parseFloat(document.getElementById('quota').value);
+        let pay = diffHours <= quota ? diffHours * rate : (quota * rate) + ((diffHours - quota) * rate * 1.25);
+
+        const log = {
+            date: new Date().toLocaleDateString('he-IL'),
+            timestamp: Date.now(),
+            duration: diffHours.toFixed(2),
+            pay: pay.toFixed(2)
+        };
+
+        if (currentUser) {
+            await db.collection('users').doc(currentUser.uid).collection('logs').add(log);
+        }
+        
+        localStorage.removeItem('active_start');
+        sendNotify("משמרת הסתיימה", `עבדת ${log.duration} שעות. השכר: ₪${log.pay}`);
+        location.reload();
+    }
+
+    async function loadData() {
+        if (!currentUser) return;
+        const snapshot = await db.collection('users').doc(currentUser.uid).collection('logs').orderBy('timestamp', 'desc').limit(10).get();
+        const logs = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
+        renderUI(logs);
+    }
+
+    function renderUI(logs) {
+        document.getElementById('logBody').innerHTML = logs.map(l => 
+            `<tr><td>${l.date}</td><td>${l.duration} ש'</td><td>₪${l.pay}</td><td onclick="deleteLog('${l.id}')">❌</td></tr>`).join('');
+        
+        const ctx = document.getElementById('workChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: logs.slice(0,7).map(l => l.date).reverse(),
+                datasets: [{ label: 'שעות', data: logs.slice(0,7).map(l => l.duration).reverse(), backgroundColor: '#3498db' }]
+            }
+        });
+    }
+
+    async function deleteLog(id) {
+        if (confirm("למחוק?") && currentUser) {
+            await db.collection('users').doc(currentUser.uid).collection('logs').doc(id).delete();
+            location.reload();
+        }
+    }
+
+    function exportPDF() {
+        html2pdf().from(document.body).save('Work_Report.pdf');
+    }
+
+    window.onload = () => {
+        const savedStart = localStorage.getItem('active_start');
+        if(savedStart) {
+            const start = new Date(savedStart);
+            document.getElementById('status').innerText = "עובד עכשיו...";
+            setInterval(() => {
+                const diff = Math.floor((new Date() - start) / 1000);
+                const h = Math.floor(diff/3600).toString().padStart(2,'0');
+                const m = Math.floor((diff%3600)/60).toString().padStart(2,'0');
+                const s = (diff%60).toString().padStart(2,'0');
+                document.getElementById('countdown').innerText = `${h}:${m}:${s}`;
+                
+                // בדיקת חריגת שעות להתראה
+                if (diff/3600 >= parseFloat(document.getElementById('quota').value)) {
+                    document.getElementById('countdown').style.color = "#27ae60";
+                }
+            }, 1000);
+        }
+    };
+</script>
+</body>
+</html>
