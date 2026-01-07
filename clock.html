@@ -3,190 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WorkTime Premium</title>
+    <title>WorkTime Elite</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
-        :root { --bg: #050505; --card: #121212; --accent: #3d8bff; --text: #ffffff; --text-dim: #a0a0a0; --border: #222; --success: #00e676; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); margin: 0; padding: 15px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+        :root { --bg: #0a0a0c; --card: rgba(255, 255, 255, 0.03); --accent: #3d8bff; --text: #f0f0f0; --success: #00f2a6; --border: rgba(255, 255, 255, 0.08); }
+        * { box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
         
-        /* Splash Screen */
-        #welcomeSplash { position: fixed; inset: 0; background: var(--bg); z-index: 2000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; transition: opacity 0.5s ease; }
+        .glass { background: var(--card); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 30px; width: 100%; max-width: 450px; padding: 25px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .timer { font-size: 4.5rem; font-weight: 100; text-align: center; margin: 15px 0; font-variant-numeric: tabular-nums; background: linear-gradient(to bottom, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        /* Login Overlay */
-        #loginOverlay { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .badge { background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
         
-        .card { background: var(--card); width: 100%; max-width: 480px; border-radius: 28px; padding: 25px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .timer { font-size: 4rem; font-weight: 200; text-align: center; margin: 20px 0; font-variant-numeric: tabular-nums; letter-spacing: -2px; }
-        .status-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.9rem; }
+        .btn-main { width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 700; cursor: pointer; font-size: 1.1rem; transition: 0.3s; margin: 8px 0; }
+        .btn-in { background: #fff; color: #000; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+        .btn-out { background: transparent; color: #fff; border: 1px solid var(--border); }
+        .btn-in:active, .btn-out:active { transform: scale(0.97); }
+
+        .history-card { padding: 15px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .history-card:last-child { border: none; }
         
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        button { padding: 18px; border-radius: 16px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 1rem; }
-        .btn-in { background: var(--text); color: var(--bg); }
-        .btn-out { background: transparent; color: var(--text); border: 1px solid var(--border); }
-        .btn-action { background: #1a1a1a; color: var(--text-dim); width: 100%; margin-top: 15px; border: 1px solid var(--border); }
-        
-        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #181818; border-radius: 14px; margin-bottom: 10px; border: 1px solid var(--border); }
-        .action-icon { cursor: pointer; opacity: 0.5; padding: 5px; }
-        
-        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-        input { background: #1a1a1a; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 10px; width: 100%; margin-top: 5px; outline: none; }
+        input { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 12px; width: 100%; margin-top: 5px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--accent); background: rgba(255,255,255,0.1); }
+
+        #manualModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
+        #welcomeSplash { position: fixed; inset: 0; background: var(--bg); z-index: 4000; display: none; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div id="loginOverlay">
-    <h1 style="font-weight: 300;">WorkTime PRO</h1>
-    <button onclick="login()" style="background:white; color:black; padding:15px 40px; border-radius:14px;">התחבר עם Google</button>
-</div>
-
 <div id="welcomeSplash">
-    <div id="greetingText" style="font-size: 3rem; font-weight: 200;"></div>
-    <div id="userNameSplash" style="font-size: 1.2rem; color: var(--accent); margin-top: 10px; letter-spacing: 2px;"></div>
+    <div id="greetingText" style="font-size: 3rem; font-weight: 100;"></div>
+    <div id="userNameSplash" style="font-size: 1.1rem; color: var(--accent); margin-top: 10px; font-weight: 700; letter-spacing: 3px;"></div>
 </div>
 
-<div class="card">
+<div id="manualModal">
+    <div class="glass" style="max-width: 350px;">
+        <h3 style="margin-top:0">הוספה ידנית</h3>
+        <label>תאריך</label><input type="date" id="mDate">
+        <label style="margin-top:10px; display:block">כמות שעות</label><input type="number" id="mHours" placeholder="למשל: 8.5" step="0.1">
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn-main" style="background:var(--accent); color:#fff" onclick="submitManual()">שמור</button>
+            <button class="btn-main" style="background:#333; color:#fff" onclick="closeModal()">ביטול</button>
+        </div>
+    </div>
+</div>
+
+<div class="glass">
     <div class="status-header">
-        <div id="statusBadge" style="color: var(--text-dim);">טוען...</div>
-        <div id="monthlyPay" style="font-weight: bold; color: var(--success); font-size: 1.1rem;">₪0</div>
+        <div class="badge" id="statusBadge">טוען...</div>
+        <div style="text-align:left"><small style="color:var(--success)">שכר חודשי</small><br><b id="monthlyPay" style="font-size:1.2rem">₪0</b></div>
     </div>
     <div class="timer" id="display">00:00:00</div>
-    <div class="btn-group">
-        <button class="btn-out" onclick="punchOut()">סיום</button>
-        <button class="btn-in" onclick="punchIn()">כניסה</button>
-    </div>
+    <button class="btn-in" id="btnAction" onclick="toggleShift()">כניסה למשמרת</button>
 </div>
 
-<div class="card" style="padding-top: 15px;">
-    <div style="font-weight: 600; margin-bottom: 15px; font-size: 0.85rem; color: var(--text-dim);">ניהול שעות</div>
+<div class="glass">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+        <span style="font-weight:600">היסטוריה</span>
+        <span style="color:var(--accent); cursor:pointer; font-size:0.9rem" onclick="openModal()">+ הוספה</span>
+    </div>
     <div id="historyList"></div>
-    <button class="btn-action" onclick="manualAdd()">+ הוספה ידנית</button>
 </div>
 
-<div class="card">
-    <div class="config-grid">
-        <div><label style="font-size: 0.7rem;">₪ לשעה</label><input type="number" id="rate" value="50"></div>
-        <div><label style="font-size: 0.7rem;">תקן יומי</label><input type="number" id="std" value="9.5"></div>
-    </div>
+<div class="glass" style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+    <div><label style="font-size:0.7rem; opacity:0.6">₪ לשעה</label><input type="number" id="rate" onchange="saveSettings()"></div>
+    <div><label style="font-size:0.7rem; opacity:0.6">תקן יומי</label><input type="number" id="std" onchange="saveSettings()"></div>
 </div>
 
 <script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyB6k04PIDrtH0lN1mMH8d4mrQbU_Wd6EPY",
-        authDomain: "clooc-87768.firebaseapp.com",
-        projectId: "clooc-87768",
-        storageBucket: "clooc-87768.firebasestorage.app",
-        messagingSenderId: "446568496274",
-        appId: "1:446568496274:web:c1aead85e32d21d0e5ba4b"
-    };
-
+    const firebaseConfig = { apiKey: "AIzaSyB6k04PIDrtH0lN1mMH8d4mrQbU_Wd6EPY", authDomain: "clooc-87768.firebaseapp.com", projectId: "clooc-87768", storageBucket: "clooc-87768.firebasestorage.app", messagingSenderId: "446568496274", appId: "1:446568496274:web:c1aead85e32d21d0e5ba4b" };
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    let user = null;
+    const auth = firebase.auth(); const db = firebase.firestore();
+    let user = null; let timerInt;
 
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
-    async function login() { 
-        try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e) { alert("שגיאת התחברות"); }
-    }
-
-    auth.onAuthStateChanged(u => {
-        if (u) {
-            user = u;
-            document.getElementById('loginOverlay').style.display = 'none';
-            showSplash(u.displayName.split(' ')[0]);
-            loadData();
-            checkActive();
-        }
+    auth.onAuthStateChanged(u => { 
+        if(u) { user = u; showSplash(u.displayName.split(' ')[0]); loadSettings(); loadData(); checkActive(); } 
+        else { location.href = 'index.html'; } // חזרה לדף כניסה אם לא מחובר
     });
 
     function showSplash(name) {
-        const hour = new Date().getHours();
-        let greeting = "לילה טוב";
-        if (hour >= 5 && hour < 12) greeting = "בוקר טוב";
-        else if (hour >= 12 && hour < 17) greeting = "צהריים טובים";
-        else if (hour >= 17 && hour < 21) greeting = "ערב טוב";
-
-        const splash = document.getElementById('welcomeSplash');
-        document.getElementById('greetingText').innerText = greeting;
-        document.getElementById('userNameSplash').innerText = name;
-        splash.style.display = 'flex';
-        
-        setTimeout(() => {
-            splash.style.opacity = '0';
-            setTimeout(() => splash.style.display = 'none', 500);
-        }, 2200);
-        
-        document.getElementById('statusBadge').innerText = `${greeting}, ${name}`;
+        const h = new Date().getHours();
+        let g = h<12?"בוקר טוב":h<17?"צהריים טובים":h<21?"ערב טוב":"לילה טוב";
+        document.getElementById('greetingText').innerText = g;
+        document.getElementById('userNameSplash').innerText = name.toUpperCase();
+        document.getElementById('welcomeSplash').style.display='flex';
+        setTimeout(() => { document.getElementById('welcomeSplash').style.opacity='0'; setTimeout(()=>document.getElementById('welcomeSplash').style.display='none',500); }, 2000);
     }
 
-    function punchIn() {
-        if(localStorage.getItem('job_start')) return;
-        localStorage.setItem('job_start', new Date().toISOString());
-        checkActive();
+    function saveSettings() {
+        const data = { rate: document.getElementById('rate').value, std: document.getElementById('std').value };
+        localStorage.setItem('user_settings', JSON.stringify(data));
     }
 
-    async function punchOut() {
+    function loadSettings() {
+        const s = JSON.parse(localStorage.getItem('user_settings')) || {rate:50, std:9.5};
+        document.getElementById('rate').value = s.rate;
+        document.getElementById('std').value = s.std;
+    }
+
+    function toggleShift() {
         const start = localStorage.getItem('job_start');
-        if(!start) return;
-        const hours = (new Date() - new Date(start)) / 3600000;
-        await saveLog(new Date().toLocaleDateString('he-IL'), hours);
-        localStorage.removeItem('job_start');
-        location.reload();
+        if(!start) {
+            localStorage.setItem('job_start', new Date().toISOString());
+            checkActive();
+        } else {
+            const hours = (new Date() - new Date(start)) / 3600000;
+            saveLog(new Date().toLocaleDateString('en-CA'), hours);
+            localStorage.removeItem('job_start');
+            location.reload();
+        }
     }
 
     async function saveLog(date, hours) {
-        const rate = parseFloat(document.getElementById('rate').value);
-        const isThur = new Date().getDay() === 4;
-        const standard = isThur ? parseFloat(document.getElementById('std').value) - 1 : parseFloat(document.getElementById('std').value);
-        let pay = hours <= standard ? hours * rate : (standard * rate) + ((hours - standard) * rate * 1.25);
-        
-        await db.collection('users').doc(user.uid).collection('logs').add({
-            date, hours: parseFloat(hours.toFixed(2)), pay: Math.round(pay), timestamp: Date.now(), month: new Date().getMonth() + 1
-        });
+        const s = JSON.parse(localStorage.getItem('user_settings'));
+        const isThur = new Date(date).getDay() === 4;
+        const std = isThur ? s.std - 1 : s.std;
+        let pay = hours <= std ? hours * s.rate : (std * s.rate) + ((hours - std) * s.rate * 1.25);
+        await db.collection('users').doc(user.uid).collection('logs').add({ date, hours: parseFloat(hours.toFixed(2)), pay: Math.round(pay), timestamp: new Date(date).getTime(), month: new Date(date).getMonth() + 1 });
+        loadData();
     }
 
     async function loadData() {
         const snap = await db.collection('users').doc(user.uid).collection('logs').orderBy('timestamp', 'desc').get();
-        const logs = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
-        const currentMonth = new Date().getMonth() + 1;
-        
-        let monthTotal = 0;
-        document.getElementById('historyList').innerHTML = logs.slice(0, 5).map(l => {
-            if(l.month === currentMonth) monthTotal += l.pay;
-            return `
-            <div class="history-item">
-                <div><small style="color:var(--text-dim)">${l.date}</small><br><b>${l.hours} שעות</b></div>
-                <div style="display:flex; align-items:center; gap:15px;">
-                    <span style="font-weight:600">₪${l.pay}</span>
-                    <span class="action-icon" onclick="deleteItem('${l.id}')">🗑️</span>
-                </div>
+        const logs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        const currM = new Date().getMonth() + 1;
+        let mTotal = 0;
+        document.getElementById('historyList').innerHTML = logs.slice(0,5).map(l => {
+            if(l.month === currM) mTotal += l.pay;
+            return `<div class="history-card">
+                <div><small style="opacity:0.5">${l.date}</small><br><b>${l.hours} שעות</b></div>
+                <div style="text-align:left"><b>₪${l.pay}</b><br><small style="color:#ff4444; cursor:pointer" onclick="deleteItem('${l.id}')">מחק</small></div>
             </div>`;
         }).join('');
-        document.getElementById('monthlyPay').innerText = `₪${monthTotal}`;
+        document.getElementById('monthlyPay').innerText = `₪${mTotal.toLocaleString()}`;
     }
 
-    async function deleteItem(id) {
-        if(confirm('למחוק רשומה זו?')) {
-            await db.collection('users').doc(user.uid).collection('logs').doc(id).delete();
-            loadData();
-        }
+    async function deleteItem(id) { if(confirm('למחוק?')) { await db.collection('users').doc(user.uid).collection('logs').doc(id).delete(); loadData(); } }
+    
+    function openModal() { document.getElementById('manualModal').style.display='flex'; }
+    function closeModal() { document.getElementById('manualModal').style.display='none'; }
+    
+    async function submitManual() {
+        const d = document.getElementById('mDate').value;
+        const h = document.getElementById('mHours').value;
+        if(d && h) { await saveLog(d, parseFloat(h)); closeModal(); }
     }
 
-    function manualAdd() {
-        const h = prompt("כמה שעות להוסיף?");
-        if(h && !isNaN(h)) saveLog(new Date().toLocaleDateString('he-IL'), parseFloat(h)).then(loadData);
-    }
-
-    let timerInt;
     function checkActive() {
         const start = localStorage.getItem('job_start');
         if(start) {
-            document.getElementById('statusBadge').style.color = "var(--success)";
-            if(timerInt) clearInterval(timerInt);
+            document.getElementById('btnAction').innerText = "סיים משמרת";
+            document.getElementById('btnAction').className = "btn-main btn-out";
+            document.getElementById('statusBadge').innerText = "במשמרת";
+            document.getElementById('statusBadge').style.color = var(--success);
             timerInt = setInterval(() => {
                 const s = Math.floor((new Date() - new Date(start)) / 1000);
                 document.getElementById('display').innerText = new Date(s * 1000).toISOString().substr(11, 8);
