@@ -3,36 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WorkTime Fix</title>
+    <title>WorkTime Ultra Fix</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
         :root { --bg: #000; --card: #121212; --accent: #3478F6; --text: #fff; --danger: #FF3B30; --gray: #8E8E93; }
-        * { box-sizing: border-box; font-family: -apple-system, system-ui; margin: 0; padding: 0; touch-action: manipulation; }
+        * { box-sizing: border-box; font-family: -apple-system, system-ui; margin: 0; padding: 0; }
         body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .header { padding: 40px 25px 10px; text-align: right; }
         .status-text { font-size: 2.5rem; font-weight: 700; margin-top: 10px; }
-        .entry-time { color: var(--accent); font-size: 0.9rem; margin-top: 5px; min-height: 1.2rem; }
-        .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .timer { font-size: 5rem; font-weight: 200; margin-bottom: 30px; font-variant-numeric: tabular-nums; color: var(--accent); }
+        .timer { font-size: 5rem; font-weight: 200; margin: 30px 0; font-variant-numeric: tabular-nums; color: var(--accent); text-align: center; }
         .timer.overtime { color: var(--danger); }
-        .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; width: 100%; max-width: 400px; text-align: center; margin-bottom: 40px; }
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); width: 100%; max-width: 400px; text-align: center; margin: 0 auto 40px; }
         .stat-val { font-size: 1.1rem; font-weight: 600; display: block; }
         .stat-label { font-size: 0.7rem; color: var(--gray); margin-top: 4px; display: block; }
-        .btn-main { width: 100%; max-width: 350px; padding: 18px; border-radius: 16px; border: none; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
+        .btn-main { width: 90%; max-width: 350px; padding: 18px; border-radius: 16px; border: none; font-size: 1.1rem; font-weight: 700; cursor: pointer; display: block; margin: 0 auto; }
         .btn-entry { background: #fff; color: #000; }
         .btn-exit { background: var(--danger); color: #fff; }
-        .nav { background: #0A0A0A; border-top: 1px solid #1C1C1E; display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 10px 0 30px; }
-        .nav-item { text-align: center; color: var(--gray); font-size: 0.65rem; cursor: pointer; }
+        .nav { background: #0A0A0A; border-top: 1px solid #1C1C1E; display: grid; grid-template-columns: repeat(3, 1fr); padding: 10px 0 30px; }
+        .nav-item { text-align: center; color: var(--gray); font-size: 0.7rem; cursor: pointer; }
         .nav-item.active { color: var(--accent); }
-        .nav-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; overflow-y: auto; padding-bottom: 100px; }
         .screen.active { display: flex; }
-        table { width: 100%; border-collapse: collapse; }
-        tr { border-bottom: 1px solid #1C1C1E; }
-        td { padding: 18px 15px; font-size: 1rem; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        td { padding: 18px 15px; border-bottom: 1px solid #1C1C1E; }
     </style>
 </head>
 <body>
@@ -43,22 +39,20 @@
     <div class="header">
         <div id="currentDateHeader" style="color:var(--accent); font-weight:600"></div>
         <div class="status-text">שעון נוכחות</div>
-        <div class="entry-time" id="entryDisplay">מוכן</div>
+        <div id="entryDisplay" style="color:var(--gray); font-size:0.9rem">מוכן</div>
     </div>
-    <div class="content">
-        <div class="timer" id="display">00:00:00</div>
-        <div class="stats">
-            <div class="stat-item"><span class="stat-val" id="exitTime">--:--</span><span class="stat-label">יציאה</span></div>
-            <div class="stat-item"><span class="stat-val" id="overtimeVal">0.0</span><span class="stat-label">חריגה</span></div>
-            <div class="stat-item"><span class="stat-val" id="dayType">א'-ד'</span><span class="stat-label">סוג יום</span></div>
-        </div>
-        <button id="shiftBtn" class="btn-main btn-entry" onclick="toggleShift()">כניסה</button>
+    <div class="timer" id="display">00:00:00</div>
+    <div class="stats">
+        <div class="stat-item"><span class="stat-val" id="exitTime">--:--</span><span class="stat-label">יציאה</span></div>
+        <div class="stat-item"><span class="stat-val" id="overtimeVal">0.0</span><span class="stat-label">חריגה</span></div>
+        <div class="stat-item"><span class="stat-val" id="dayType">א'-ה'</span><span class="stat-label">סוג יום</span></div>
     </div>
+    <button id="shiftBtn" class="btn-main btn-entry" onclick="toggleShift()">כניסה</button>
 </div>
 
 <div id="screen-report" class="screen">
     <div class="header"><div class="status-text">דוח חודשי</div></div>
-    <div style="padding: 20px;"><table id="logTable"></table></div>
+    <div style="padding: 10px 20px;"><table id="logTable"></table></div>
 </div>
 
 <div id="screen-settings" class="screen">
@@ -66,14 +60,14 @@
     <div style="padding: 25px;">
         <label style="color:var(--gray); font-size:0.8rem;">תקן שעות יומי קבוע</label>
         <input type="number" id="stdInput" value="9" style="width:100%; background:#1C1C1E; border:1px solid #333; color:#fff; padding:15px; border-radius:12px; margin-top:10px; font-size:1.1rem;">
-        <button class="btn-main btn-entry" style="margin-top:20px; max-width:100%" onclick="saveSettings()">שמור תקן</button>
+        <button class="btn-main btn-entry" style="margin-top:20px; width:100%" onclick="saveSettings()">שמור תקן</button>
     </div>
 </div>
 
 <nav class="nav">
-    <div class="nav-item active" onclick="showScreen('timer')"><span class="nav-icon">🕒</span>שעון</div>
-    <div class="nav-item" onclick="showScreen('report')"><span class="nav-icon">📋</span>דוח</div>
-    <div class="nav-item" onclick="showScreen('settings')"><span class="nav-icon">⚙️</span>הגדרות</div>
+    <div class="nav-item active" onclick="showScreen('timer')">🕒<br>שעון</div>
+    <div class="nav-item" onclick="showScreen('report')">📋<br>דוח</div>
+    <div class="nav-item" onclick="showScreen('settings')">⚙️<br>הגדרות</div>
 </nav>
 
 <script>
@@ -82,43 +76,50 @@
     const auth = firebase.auth(); const db = firebase.firestore();
     let user = null, std = 9, timerInt;
 
-    async function login() { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+    async function login() { try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e) { alert("שגיאת התחברות: " + e.message); } }
 
     auth.onAuthStateChanged(async u => {
         if(u) {
-            user = u; document.getElementById('loginOverlay').style.display = 'none';
+            user = u;
+            document.getElementById('loginOverlay').style.display = 'none';
             const doc = await db.collection('users').doc(user.uid).get();
             if(doc.exists) { std = parseFloat(doc.data().std || 9); document.getElementById('stdInput').value = std; }
-            loadData(); checkActive(); updateHeader();
-        } else { document.getElementById('loginOverlay').style.display = 'flex'; }
+            updateHeader(); checkActive(); loadData();
+        } else {
+            document.getElementById('loginOverlay').style.display = 'flex';
+        }
     });
 
     function updateHeader() {
-        const now = new Date();
         const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
+        const now = new Date();
         document.getElementById('currentDateHeader').innerText = `יום ${days[now.getDay()]} | ${now.toLocaleDateString('he-IL')}`;
     }
 
     async function toggleShift() {
         const start = localStorage.getItem('active_start');
-        const btn = document.getElementById('shiftBtn');
         if(!start) {
             localStorage.setItem('active_start', new Date().toISOString());
             checkActive();
         } else {
+            const btn = document.getElementById('shiftBtn');
             btn.disabled = true; btn.innerText = "שומר...";
-            const now = new Date();
-            const startDay = new Date(start);
-            const hours = (now - startDay) / 3600000;
-            const dateStr = startDay.toLocaleDateString('sv-SE'); 
             
+            const startDay = new Date(start);
+            const hours = ((new Date() - startDay) / 3600000).toFixed(2);
+            const dateStr = startDay.toLocaleDateString('sv-SE');
+
+            const logEntry = { date: dateStr, hours: parseFloat(hours), timestamp: Date.now() };
+
             try {
-                await db.collection('users').doc(user.uid).collection('logs').add({
-                    date: dateStr, hours: parseFloat(hours.toFixed(2)), timestamp: Date.now()
-                });
+                await db.collection('users').doc(user.uid).collection('logs').add(logEntry);
                 localStorage.removeItem('active_start');
                 location.reload();
-            } catch (e) { alert("שגיאה בשמירה"); btn.disabled = false; }
+            } catch (e) {
+                alert("שגיאת סנכרון לענן, נסה שנית");
+                btn.disabled = false;
+                btn.innerText = "סיום משמרת";
+            }
         }
     }
 
@@ -129,9 +130,11 @@
             btn.innerText = "סיום משמרת"; btn.className = "btn-main btn-exit";
             const entry = new Date(start);
             document.getElementById('entryDisplay').innerText = `כניסה: ${entry.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
+            
             const dayStd = entry.getDay() === 4 ? std - 1 : std;
             const exit = new Date(entry.getTime() + dayStd * 3600000);
             document.getElementById('exitTime').innerText = exit.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
             timerInt = setInterval(() => {
                 const s = Math.floor((new Date() - entry) / 1000);
                 let rem = (dayStd * 3600) - s;
@@ -143,17 +146,19 @@
     }
 
     async function loadData() {
+        if(!user) return;
         const snap = await db.collection('users').doc(user.uid).collection('logs').orderBy('timestamp', 'desc').get();
-        document.getElementById('logTable').innerHTML = snap.docs.map(doc => {
+        const html = snap.docs.map(doc => {
             const d = doc.data();
             return `<tr><td>${d.date.split('-').reverse().join('/')}</td><td style="text-align:left; font-weight:bold;">${d.hours} שעות</td></tr>`;
         }).join('');
+        document.getElementById('logTable').innerHTML = html || '<tr><td style="text-align:center">אין נתונים עדיין</td></tr>';
     }
 
     async function saveSettings() {
         std = parseFloat(document.getElementById('stdInput').value);
         await db.collection('users').doc(user.uid).set({std: std}, {merge:true});
-        alert("נשמר"); location.reload();
+        alert("הגדרות נשמרו"); location.reload();
     }
 
     function showScreen(id) {
