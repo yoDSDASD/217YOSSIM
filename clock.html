@@ -3,69 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WorkTime Premium v9</title>
+    <title>WorkTime Premium v10</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
-        :root { --bg: #000; --card: #121212; --accent: #3478F6; --text: #fff; --danger: #FF3B30; --gray: #8E8E93; --success: #34C759; }
+        :root { --bg: #000; --card: #121212; --accent: #3478F6; --text: #fff; --danger: #FF3B30; --gray: #8E8E93; }
         * { box-sizing: border-box; font-family: -apple-system, system-ui; margin: 0; padding: 0; touch-action: manipulation; }
         body { background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        
-        #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
         .header { padding: 40px 25px 10px; text-align: right; }
         .status-text { font-size: 2.5rem; font-weight: 700; margin-top: 10px; }
         .entry-time { color: var(--accent); font-size: 0.9rem; margin-top: 5px; min-height: 1.2rem; }
-
         .content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
         .timer { font-size: 5.5rem; font-weight: 200; letter-spacing: -2px; margin-bottom: 30px; font-variant-numeric: tabular-nums; color: var(--accent); }
         .timer.overtime { color: var(--danger); }
-
         .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; width: 100%; max-width: 400px; text-align: center; margin-bottom: 40px; }
         .stat-item { border-left: 1px solid #333; }
         .stat-item:last-child { border-left: none; }
         .stat-val { font-size: 1.1rem; font-weight: 600; display: block; }
         .stat-label { font-size: 0.7rem; color: var(--gray); margin-top: 4px; display: block; }
-
         .btn-main { width: 100%; max-width: 350px; padding: 18px; border-radius: 16px; border: none; font-size: 1.1rem; font-weight: 700; cursor: pointer; }
         .btn-entry { background: #fff; color: #000; }
         .btn-exit { background: var(--danger); color: #fff; }
-
         .nav { background: #0A0A0A; border-top: 1px solid #1C1C1E; display: grid; grid-template-columns: 1fr 1fr 1fr; padding: 10px 0 30px; }
         .nav-item { text-align: center; color: var(--gray); font-size: 0.65rem; cursor: pointer; }
         .nav-item.active { color: var(--accent); }
         .nav-icon { font-size: 1.4rem; display: block; margin-bottom: 4px; }
-
         .screen { display: none; width: 100%; height: 100%; flex-direction: column; overflow-y: auto; padding-bottom: 100px; }
         .screen.active { display: flex; }
         table { width: 100%; border-collapse: collapse; }
         tr { border-bottom: 1px solid #1C1C1E; }
         td { padding: 18px 15px; font-size: 1rem; }
+        #loginOverlay { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
-    <div style="font-size:3rem; margin-bottom:20px">🔐</div>
-    <h2 style="margin-bottom:10px">התחברות למערכת</h2>
-    <p style="color:var(--gray); margin-bottom:30px">סנכרון נתונים מאובטח לכל המכשירים</p>
-    <button onclick="login()" class="btn-main" style="background:#fff; color:#000; display:flex; align-items:center; justify-content:center; gap:10px; margin:0 auto;">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="20"> התחבר עם Google
-    </button>
+    <button onclick="login()" class="btn-main btn-entry">התחבר עם Google</button>
 </div>
 
 <div id="screen-timer" class="screen active">
     <div class="header">
         <div id="currentDateHeader" style="color:var(--accent); font-weight:600"></div>
         <div class="status-text">שעון נוכחות</div>
-        <div class="entry-time" id="entryDisplay">מוכן לתחילת עבודה</div>
+        <div class="entry-time" id="entryDisplay">מוכן</div>
     </div>
     <div class="content">
         <div class="timer" id="display">00:00:00</div>
         <div class="stats">
-            <div class="stat-item"><span class="stat-val" id="exitTime">--:--</span><span class="stat-label">יציאה בתקן</span></div>
-            <div class="stat-item"><span class="stat-val" id="overtimeVal">0.0</span><span class="stat-label">חריגה (ש')</span></div>
-            <div class="stat-item"><span class="stat-val" id="dayType">א'-ד'</span><span class="stat-label">סוג יום</span></div>
+            <div class="stat-item"><span class="stat-val" id="exitTime">--:--</span><span class="stat-label">יציאה</span></div>
+            <div class="stat-item"><span class="stat-val" id="overtimeVal">0.0</span><span class="stat-label">חריגה</span></div>
+            <div class="stat-item"><span class="stat-val" id="dayType">א'-ה'</span><span class="stat-label">סוג יום</span></div>
         </div>
         <button id="shiftBtn" class="btn-main btn-entry" onclick="toggleShift()">כניסה</button>
     </div>
@@ -73,16 +62,15 @@
 
 <div id="screen-report" class="screen">
     <div class="header"><div class="status-text">דוח חודשי</div></div>
-    <div style="padding: 10px 20px;"><table id="logTable"></table></div>
+    <div style="padding: 20px;"><table id="logTable"></table></div>
 </div>
 
 <div id="screen-settings" class="screen">
     <div class="header"><div class="status-text">הגדרות</div></div>
     <div style="padding: 25px;">
-        <label style="color:var(--gray); font-size:0.8rem;">תקן שעות יומי (א'-ה')</label>
-        <input type="number" id="stdInput" style="width:100%; background:#1C1C1E; border:1px solid #333; color:#fff; padding:15px; border-radius:12px; margin-top:10px; font-size:1.1rem;">
+        <label style="color:var(--gray); font-size:0.8rem;">תקן שעות יומי קבוע (למשל 9)</label>
+        <input type="number" id="stdInput" value="9" style="width:100%; background:#1C1C1E; border:1px solid #333; color:#fff; padding:15px; border-radius:12px; margin-top:10px; font-size:1.1rem;">
         <button class="btn-main btn-entry" style="margin-top:20px; max-width:100%" onclick="saveSettings()">שמור תקן</button>
-        <button onclick="auth.signOut(); location.reload();" style="margin-top:50px; color:var(--danger); background:none; border:none; width:100%; font-weight:bold;">התנתק</button>
     </div>
 </div>
 
@@ -96,7 +84,7 @@
     const firebaseConfig = { apiKey: "AIzaSyB6k04PIDrtH0lN1mMH8d4mrQbU_Wd6EPY", authDomain: "clooc-87768.firebaseapp.com", projectId: "clooc-87768", storageBucket: "clooc-87768.firebasestorage.app", messagingSenderId: "446568496274", appId: "1:446568496274:web:c1aead85e32d21d0e5ba4b" };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth(); const db = firebase.firestore();
-    let user = null, timerInt, std = 9;
+    let user = null, std = 9, timerInt;
 
     async function login() { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
 
@@ -113,32 +101,27 @@
         const now = new Date();
         const days = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
         document.getElementById('currentDateHeader').innerText = `יום ${days[now.getDay()]} | ${now.toLocaleDateString('he-IL')}`;
-        document.getElementById('dayType').innerText = now.getDay() === 4 ? "חמישי (-1)" : "א'-ד'";
     }
 
     async function toggleShift() {
         const start = localStorage.getItem('active_start');
-        const btn = document.getElementById('shiftBtn');
-        
         if(!start) {
             localStorage.setItem('active_start', new Date().toISOString());
             checkActive();
         } else {
+            const btn = document.getElementById('shiftBtn');
             btn.disabled = true; btn.innerText = "שומר...";
-            const hours = (new Date() - new Date(start)) / 3600000;
-            const dateStr = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const hours = (now - new Date(start)) / 3600000;
+            const dateStr = now.toLocaleDateString('sv-SE'); // YYYY-MM-DD
             
-            try {
-                // הבטחת שמירה ב-Firestore
-                await db.collection('users').doc(user.uid).collection('logs').doc(dateStr).set({
-                    date: dateStr, hours: parseFloat(hours.toFixed(2)), timestamp: Date.now()
-                });
-                localStorage.removeItem('active_start');
-                location.reload(); 
-            } catch (e) {
-                alert("שגיאה בשמירה, נסה שוב");
-                btn.disabled = false;
-            }
+            await db.collection('users').doc(user.uid).collection('logs').doc(dateStr).set({
+                date: dateStr, hours: parseFloat(hours.toFixed(2)), timestamp: Date.now()
+            });
+            
+            localStorage.removeItem('active_start');
+            clearInterval(timerInt);
+            location.reload();
         }
     }
 
@@ -146,7 +129,7 @@
         const start = localStorage.getItem('active_start');
         if(start) {
             const btn = document.getElementById('shiftBtn');
-            btn.innerText = "סיום ויציאה"; btn.className = "btn-main btn-exit";
+            btn.innerText = "סיום משמרת"; btn.className = "btn-main btn-exit";
             const entry = new Date(start);
             document.getElementById('entryDisplay').innerText = `כניסה: ${entry.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`;
             
@@ -171,27 +154,25 @@
     }
 
     async function loadData() {
-        const snap = await db.collection('users').doc(user.uid).collection('logs').orderBy('timestamp', 'desc').limit(30).get();
+        const snap = await db.collection('users').doc(user.uid).collection('logs').orderBy('timestamp', 'desc').get();
         document.getElementById('logTable').innerHTML = snap.docs.map(doc => {
             const d = doc.data();
-            const revDate = d.date.split('-').reverse().slice(0,2).join('/');
-            return `<tr><td>${revDate}</td><td style="text-align:left; font-weight:bold;">${d.hours} שעות</td><td onclick="deleteLog('${doc.id}')" style="color:var(--danger); width:30px; opacity:0.5">🗑️</td></tr>`;
+            return `<tr><td>${d.date.split('-').reverse().join('/')}</td><td style="text-align:left; font-weight:bold;">${d.hours} שעות</td></tr>`;
         }).join('');
-    }
-
-    async function deleteLog(id) { if(confirm('למחוק שורה?')) { await db.collection('users').doc(user.uid).collection('logs').doc(id).delete(); loadData(); } }
-    
-    function showScreen(id) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById('screen-' + id).classList.add('active');
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        event.currentTarget.classList.add('active');
     }
 
     async function saveSettings() {
         std = parseFloat(document.getElementById('stdInput').value);
         await db.collection('users').doc(user.uid).set({std: std}, {merge:true});
-        alert("התקן עודכן");
+        alert("תקן נשמר");
+        location.reload();
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById('screen-' + id).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        event.currentTarget.classList.add('active');
     }
 </script>
 </body>
