@@ -3,17 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>QC MASTER</title>
+<title>QC MASTER 0.000</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #000000;
     --panel: #141414;
-    --primary: #2979ff; /* כחול */
-    --danger: #ff1744;  /* אדום */
-    --success: #00e676; /* ירוק */
+    --primary: #2979ff;
+    --danger: #ff1744;
+    --success: #00e676;
     --text: #ffffff;
     --border: #333;
+    --placeholder: #444; /* צבע אפור כהה למספרי הרקע */
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -29,7 +30,7 @@
     overflow: hidden;
   }
 
-  /* --- אזור עליון קבוע (לא זז ולא מוסתר) --- */
+  /* --- אזור עליון קבוע --- */
   .top-deck {
     flex: 0 0 auto;
     background: var(--panel);
@@ -39,7 +40,6 @@
     box-shadow: 0 10px 40px rgba(0,0,0,0.8);
   }
 
-  /* גריד תוצאות */
   .hud {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -67,7 +67,6 @@
   .c-min { color: var(--primary); }
   .c-rng { color: var(--success); }
 
-  /* כפתורים למעלה */
   .actions {
     display: flex;
     gap: 10px;
@@ -92,17 +91,15 @@
     flex: 1;
     overflow-y: auto;
     padding: 20px;
-    /* הרווח הזה מציל את המצב - מאפשר לגלול את השדות מעל המקלדת */
     padding-bottom: 50vh; 
   }
 
   .field-row { margin-bottom: 25px; }
 
-  /* עיצוב התוויות הגדולות */
   .big-symbol {
     display: block;
     text-align: center;
-    font-size: 3.5rem; /* ענק! */
+    font-size: 3.5rem;
     line-height: 0.8;
     font-weight: 900;
     margin-bottom: 10px;
@@ -112,7 +109,6 @@
   .sym-minus { color: var(--primary); }
   .sym-nom { font-size: 1rem; color: #888; letter-spacing: 1px; line-height: 1.5; margin-bottom: 5px; }
 
-  /* שדות הקלט */
   input {
     width: 100%;
     background: #000;
@@ -129,13 +125,16 @@
     transition: 0.2s;
   }
 
-  input:focus { border-color: #fff; background: #080808; }
+  /* צבע ל-0.000 כשהשדה ריק */
+  input::placeholder {
+    color: var(--placeholder);
+    opacity: 1; 
+  }
 
-  /* צבעים בפוקוס */
+  input:focus { border-color: #fff; background: #080808; }
   .inp-red:focus { border-color: var(--danger); }
   .inp-blue:focus { border-color: var(--primary); }
 
-  /* פיצול ל-2 */
   .split {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -172,21 +171,19 @@
     
     <div class="field-row">
       <div class="big-symbol sym-nom">NOMINAL</div>
-      <input type="number" id="nominal" inputmode="decimal" step="any" placeholder="0.0">
+      <input type="number" id="nominal" inputmode="decimal" step="any" placeholder="0.000">
     </div>
 
     <div class="split">
-      
       <div>
         <div class="big-symbol sym-plus">+</div>
-        <input type="number" id="upper" class="inp-red" inputmode="decimal" step="any" placeholder="0.01">
+        <input type="number" id="upper" class="inp-red" inputmode="decimal" step="any" placeholder="0.000">
       </div>
 
       <div>
         <div class="big-symbol sym-minus">−</div>
-        <input type="number" id="lower" class="inp-blue" inputmode="decimal" step="any" placeholder="0.01">
+        <input type="number" id="lower" class="inp-blue" inputmode="decimal" step="any" placeholder="0.000">
       </div>
-
     </div>
 
   </div>
@@ -213,7 +210,7 @@
 
   function commit() {
     calc();
-    document.activeElement.blur(); // סוגר מקלדת
+    document.activeElement.blur(); 
   }
 
   function resetAll() {
@@ -224,13 +221,11 @@
     document.getElementById('nominal').focus();
   }
 
-  // הפעלה אוטומטית
   ['nominal', 'upper', 'lower'].forEach(id => {
     const el = document.getElementById(id);
     el.addEventListener('input', calc);
     el.addEventListener('focus', function() { 
       this.select();
-      // דואג שהשדה יקפוץ למרכז המסך מעל המקלדת
       setTimeout(() => this.scrollIntoView({behavior: "smooth", block: "center"}), 300);
     });
   });
