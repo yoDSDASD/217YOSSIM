@@ -2,182 +2,255 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>By yossi m  </title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>By Yosef M | QC Calc</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; }
+  :root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --primary: #2196F3;
+    --primary-hover: #1976D2;
+    --accent: #00E676;
+    --text-main: #ffffff;
+    --text-sec: #b0b0b0;
+    --border: #333;
+    --input-bg: #2c2c2c;
+    --danger: #ff5252;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  
   body {
     margin: 0;
     font-family: "Heebo", sans-serif;
-    background: #f6f6f6;
-    color: #111;
-  }
-
-  .container {
-    max-width: 360px;
-    margin: 0 auto;
-    padding: 2.5vh 4vw;
-  }
-
-  .title {
-    text-align: center;
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 0.8rem;
-  }
-
-  .input-group {
+    background-color: var(--bg-color);
+    color: var(--text-main);
     display: flex;
-    flex-direction: column;
-    margin-bottom: 0.5rem;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
   }
 
-  label {
-    font-weight: 600;
-    font-size: 0.9rem;
-    margin-bottom: 0.25rem;
+  .app-container {
+    width: 100%;
+    max-width: 400px;
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    margin: 1rem;
   }
 
-  input {
-    padding: 0.4em 0.6em;
-    font-size: 1.05rem;
-    border: 1px solid #bbb;
-    border-radius: 0.3em;
+  .header {
     text-align: center;
-    direction: ltr;
-    background: #fff;
-    transition: 0.15s;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
   }
 
-  input:focus {
-    border-color: #000;
+  .header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--primary);
+  }
+  
+  .header span {
+    font-size: 0.8rem;
+    color: var(--text-sec);
+    text-transform: uppercase;
+  }
+
+  .input-grid {
+    display: grid;
+    gap: 1.2rem;
+  }
+
+  .input-wrapper {
+    position: relative;
+  }
+
+  .input-wrapper label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-sec);
+    font-weight: 500;
+  }
+
+  .input-wrapper input {
+    width: 100%;
+    background: var(--input-bg);
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 1.2rem;
+    color: #fff;
+    font-family: monospace;
+    text-align: center;
+    transition: all 0.3s ease;
     outline: none;
   }
 
-  .result {
-    background: #fff;
-    border: 1px solid #999;
-    border-radius: 0.4em;
-    padding: 0.6em;
-    margin-top: 0.8rem;
-    font-family: monospace;
-    font-size: 1.1rem;
-    display: none;
-    direction: ltr;
-    text-align: left;
+  .input-wrapper input:focus {
+    border-color: var(--primary);
+    background: #333;
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
   }
 
-  .highlight { color: #c00000; }
+  .actions {
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+  }
 
   button {
-    width: 100%;
-    padding: 0.55em;
-    margin-top: 0.45rem;
-    font-size: 1.05rem;
-    font-weight: 600;
     border: none;
-    border-radius: 0.4em;
+    padding: 14px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: 0.2s;
+    transition: transform 0.1s, opacity 0.2s;
   }
 
-  .calc-btn {
-    background: #000;
-    color: #fff;
+  button:active { transform: scale(0.96); }
+
+  .btn-calc {
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+    color: white;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
   }
 
-  .calc-btn:hover { background: #222; }
-
-  .reset-btn {
-    background: #d7d7d7;
-    color: #000;
+  .btn-reset {
+    background: var(--input-bg);
+    color: var(--text-sec);
   }
 
-  .reset-btn:hover { background: #aaa; }
-
-  @media (max-width: 480px) {
-    .container { padding: 2.5vh 5vw; }
-    .title { font-size: 1.25rem; }
-    input { font-size: 1rem; }
-    .result { font-size: 1.05rem; }
+  .result-card {
+    margin-top: 2rem;
+    background: #252525;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: none;
   }
+
+  .result-card.show {
+    opacity: 1;
+    transform: translateY(0);
+    display: block;
+  }
+
+  .result-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-family: monospace;
+    font-size: 1.1rem;
+  }
+
+  .result-row:last-child { border-bottom: none; }
+  
+  .label-text { font-weight: bold; }
+  .val-text { font-weight: normal; }
+  
+  .c-max { color: var(--danger); }
+  .c-min { color: var(--primary); }
+  .c-rng { color: var(--accent); }
+
 </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="title">By yossi m</div>
-
-  <div class="input-group">
-    <label for="nominal">NOM</label>
-    <input type="number" step="any" id="nominal" inputmode="decimal">
+<div class="app-container">
+  <div class="header">
+    <h1>TOLERANCE</h1>
+    <span>By Yosef M</span>
   </div>
 
-  <div class="input-group">
-    <label for="upperTol">+TOL</label>
-    <input type="number" step="any" id="upperTol" inputmode="decimal">
+  <div class="input-grid">
+    <div class="input-wrapper">
+      <label>NOMINAL (מידה נומינלית)</label>
+      <input type="number" id="nominal" inputmode="decimal" placeholder="0.000">
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="input-wrapper">
+        <label>+ UPPER (+)</label>
+        <input type="number" id="upperTol" inputmode="decimal" placeholder="0.000" style="color: var(--danger);">
+      </div>
+      <div class="input-wrapper">
+        <label>− LOWER (−)</label>
+        <input type="number" id="lowerTol" inputmode="decimal" placeholder="0.000" style="color: var(--primary);">
+      </div>
+    </div>
   </div>
 
-  <div class="input-group">
-    <label for="lowerTol">−TOL</label>
-    <input type="number" step="any" id="lowerTol" inputmode="decimal">
+  <div class="result-card" id="resultCard">
+    </div>
+
+  <div class="actions">
+    <button class="btn-calc" onclick="calculate()">חשב תוצאה</button>
+    <button class="btn-reset" onclick="resetCalc()">איפוס</button>
   </div>
-
-  <div class="result" id="result"></div>
-
-  <button class="calc-btn" onclick="calculate()">חשב</button>
-  <button class="reset-btn" onclick="resetCalc()">איפוס</button>
 </div>
 
 <script>
-function format(v) {
-  return parseFloat(v).toFixed(3);
-}
-
-function blurAllInputs() {
-  document.querySelectorAll("input").forEach(inp => inp.blur());
-}
-
-function calculate() {
-  blurAllInputs();
-  const nominal = parseFloat(document.getElementById("nominal").value);
-  const upperInput = document.getElementById("upperTol").value;
-  const lowerInput = document.getElementById("lowerTol").value;
-  const resultEl = document.getElementById("result");
-
-  let upper = parseFloat(upperInput);
-  let lower = parseFloat(lowerInput);
-
-  if (isNaN(nominal)) {
-    resultEl.style.display = "block";
-    resultEl.innerHTML = "יש להזין ערך נומינלי תקין";
-    return;
+  function format(num) {
+    return parseFloat(num).toFixed(3);
   }
 
-  if (isNaN(upper)) upper = 0;
-  if (isNaN(lower)) lower = 0;
+  function calculate() {
+    const nominalVal = document.getElementById('nominal').value;
+    const upperVal = document.getElementById('upperTol').value;
+    const lowerVal = document.getElementById('lowerTol').value;
+    
+    if (nominalVal === "") {
+      alert("נא להזין מידה נומינלית");
+      return;
+    }
 
-  const max = nominal + upper;
-  const min = nominal - lower;
-  const range = max - min;
+    const nom = parseFloat(nominalVal);
+    const up = upperVal === "" ? 0 : parseFloat(upperVal);
+    const low = lowerVal === "" ? 0 : parseFloat(lowerVal);
 
-  let output = "";
-  if (upper > 0) output += `<div><strong class="highlight">MAX:</strong> ${format(max)}</div>`;
-  if (lower > 0) output += `<div><strong class="highlight">MIN:</strong> ${format(min)}</div>`;
-  if (upper > 0 && lower > 0) output += `<hr><div><strong>RANGE:</strong> ${format(range)}</div>`;
-  if (!output) output = `<div>אין נתונים להצגה</div>`;
+    const max = nom + up;
+    const min = nom - low; // חיסור הערך (הנחת עבודה שהמשתמש מזין ערך אבסולוטי למינוס או שהנוסחה מותאמת)
+    const range = (max - min); 
+    
+    // אם המשתמש מזין מינוס בתוך שדה המינוס, צריך לטפל בזה. 
+    // בדרך כלל בשרטוט: 10 +0.1 / -0.1 -> המינימום הוא 9.9.
+    // הקוד הזה מניח שהמשתמש מכניס את המספר 0.1 בשדה ה-Lower.
 
-  resultEl.innerHTML = output;
-  resultEl.style.display = "block";
-}
+    let html = '';
+    html += `<div class="result-row"><span class="label-text c-max">MAX</span> <span class="val-text">${format(max)}</span></div>`;
+    html += `<div class="result-row"><span class="label-text c-min">MIN</span> <span class="val-text">${format(min)}</span></div>`;
+    html += `<div class="result-row" style="background: rgba(0, 230, 118, 0.05);"><span class="label-text c-rng">TOTAL</span> <span class="val-text">${format(range)}</span></div>`;
 
-function resetCalc() {
-  blurAllInputs();
-  ["nominal","upperTol","lowerTol"].forEach(id => document.getElementById(id).value = "");
-  const resultEl = document.getElementById("result");
-  resultEl.innerHTML = "";
-  resultEl.style.display = "none";
-}
+    const card = document.getElementById('resultCard');
+    card.innerHTML = html;
+    card.classList.add('show');
+    
+    // סגירת מקלדת בנייד
+    document.activeElement.blur();
+  }
+
+  function resetCalc() {
+    document.getElementById('nominal').value = '';
+    document.getElementById('upperTol').value = '';
+    document.getElementById('lowerTol').value = '';
+    const card = document.getElementById('resultCard');
+    card.classList.remove('show');
+    setTimeout(() => card.innerHTML = '', 300);
+  }
 </script>
 
 </body>
