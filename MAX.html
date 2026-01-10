@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
-<title>QC STATIC MASTER</title>
+<title>QC BIG RESULTS</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -19,21 +19,20 @@
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  /* --- נעילת ברזל של המסך --- */
+  /* נעילת מסך מוחלטת */
   html, body {
     margin: 0;
     padding: 0;
     background-color: var(--bg);
     color: var(--text);
     font-family: "Heebo", sans-serif;
-    /* נועל את הגובה לגובה המסך בדיוק, בלי אפשרות חריגה */
     height: 100%; 
     width: 100%;
     overflow: hidden; 
-    position: fixed; /* זה הסוד שמונע מהאייפון לדחוף את הדף למעלה */
+    position: fixed;
   }
 
-  /* קונטיינר ראשי שמחלק את המסך */
+  /* מבנה האפליקציה */
   #app-root {
     display: flex;
     flex-direction: column;
@@ -43,38 +42,49 @@
     top: 0; left: 0; right: 0; bottom: 0;
   }
 
-  /* --- חלק 1: ראש קבוע (לא זז) --- */
+  /* --- כותרת קבועה עם תוצאות ענקיות --- */
   header {
-    flex: 0 0 auto; /* לא מתכווץ ולא מתרחב */
+    flex: 0 0 auto;
     background: var(--panel);
     border-bottom: 1px solid var(--border);
-    padding-bottom: 10px;
+    padding-bottom: 12px;
     z-index: 100;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.6);
   }
 
-  /* גריד תוצאות */
   .hud {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 1px;
-    background: #333;
-    margin-bottom: 8px;
+    background: #333; /* קוים מפרידים */
+    margin-bottom: 10px;
   }
 
   .hud-cell {
     background: var(--panel);
-    padding: 8px 2px;
+    padding: 10px 2px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
-  .hud-label { font-size: 0.7rem; color: #888; font-weight: 700; margin-bottom: 2px; }
+  .hud-label {
+    font-size: 0.75rem;
+    color: #888;
+    font-weight: 700;
+    margin-bottom: 0;
+    letter-spacing: 0.5px;
+  }
+
+  /* השינוי הגדול: טקסט ענק וברור */
   .hud-val { 
     font-family: 'Roboto Mono', monospace; 
-    font-size: 1.5rem; 
-    font-weight: 700; 
+    font-size: 2.2rem; /* גודל מקסימלי שנכנס במסך */
+    font-weight: 900; /* הכי עבה שיש */
     direction: ltr;
     line-height: 1.1;
+    letter-spacing: -1px;
   }
 
   .c-max { color: var(--danger); }
@@ -92,57 +102,53 @@
     flex: 1;
     border: none;
     border-radius: 8px;
-    padding: 12px;
-    font-size: 1.1rem;
+    padding: 14px;
+    font-size: 1.2rem;
     font-weight: 900;
     cursor: pointer;
-    background: #333;
-    color: #fff;
   }
 
-  .btn-calc { background: var(--primary); }
-  .btn-reset { color: #ccc; }
+  .btn-calc { background: var(--primary); color: white; }
+  .btn-reset { background: #333; color: #ccc; }
 
 
-  /* --- חלק 2: אזור תוכן (נגלל פנימית) --- */
+  /* --- אזור גלילה (מוגן מהמקלדת) --- */
   main {
-    flex: 1; /* לוקח את כל המקום שנשאר */
-    overflow-y: auto; /* מאפשר גלילה רק בתוך האזור הזה */
-    padding: 15px;
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
     position: relative;
-    /* ריפוד תחתון ענק כדי שהמקלדת תעלה על "אוויר" ולא על שדות */
-    padding-bottom: 50vh; 
+    padding-bottom: 55vh; /* כרית ביטחון למקלדת */
   }
 
   .field-block {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
     position: relative;
   }
 
   .label-text {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: #888;
     font-weight: 700;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
     display: block;
     text-align: right;
   }
 
-  /* אינפוטים */
   input {
     width: 100%;
     background: #000;
     border: 1px solid #333;
-    border-radius: 8px;
-    padding: 12px 15px;
-    font-size: 1.8rem;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 2rem;
     color: #fff;
     font-family: 'Roboto Mono', monospace;
     text-align: center;
     direction: ltr;
     outline: none;
     font-weight: bold;
-    height: 60px;
+    height: 65px;
   }
 
   input::placeholder { color: var(--placeholder); opacity: 1; }
@@ -151,7 +157,6 @@
   .inp-red:focus { border-color: var(--danger); }
   .inp-blue:focus { border-color: var(--primary); }
 
-  /* פיצול לשניים */
   .split {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -162,9 +167,9 @@
   .inner-symbol {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%) translateY(3px); /* תיקון אופטי קטן */
+    transform: translateY(-50%) translateY(2px);
     right: 15px;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: 900;
     pointer-events: none;
   }
@@ -260,10 +265,9 @@
     const el = document.getElementById(id);
     el.addEventListener('input', calc);
     
+    // גלילה חכמה למרכז החלון הפנוי
     el.addEventListener('focus', function() { 
       this.select();
-      // משפר את חווית הגלילה: גולל את האינפוט הספציפי למרכז אזור הגלילה
-      // אבל לא מזיז את כל העמוד כי הגוף נעול
       setTimeout(() => {
         el.scrollIntoView({behavior: "smooth", block: "center"});
       }, 300);
