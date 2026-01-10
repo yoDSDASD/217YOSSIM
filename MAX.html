@@ -3,17 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>QC PRO COMPACT</title>
+<title>QC SAFE MODE</title>
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #121212;
+    --bg: #000000;
     --card: #1c1c1e;
     --primary: #0A84FF;
     --danger: #FF453A;
     --success: #30D158;
     --text: #ffffff;
-    --muted: #8e8e93;
     --border: #333;
   }
 
@@ -24,129 +23,57 @@
     font-family: "Heebo", sans-serif;
     background-color: var(--bg);
     color: var(--text);
-    /* גובה דינמי למניעת גלילת כל העמוד */
     height: 100dvh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
   }
 
-  /* --- HEADER (תוצאות) --- */
-  header {
+  /* --- אזור בטוח עליון (לעולם לא יוסתר) --- */
+  .safe-zone {
     flex: 0 0 auto;
     background: var(--card);
-    padding: 8px 12px; /* צמצום ריפוד */
     border-bottom: 1px solid var(--border);
-    z-index: 10;
+    z-index: 100;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    padding-bottom: 10px;
   }
 
+  /* גריד תוצאות */
   .res-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 6px;
+    gap: 1px;
+    background: #333; /* קוים מפרידים */
+    border-bottom: 1px solid #333;
   }
 
   .res-box {
-    background: #2c2c2e;
-    border-radius: 8px;
-    padding: 6px 2px;
+    background: var(--card);
+    padding: 8px 2px;
     text-align: center;
-    border: 1px solid #333;
   }
 
-  .res-label {
-    font-size: 0.7rem;
-    color: var(--muted);
-    font-weight: 700;
-    margin-bottom: 2px;
-  }
-
-  .res-val {
-    font-family: monospace;
-    font-size: 1.4rem; /* קצת יותר קטן שייכנס בנוח */
-    font-weight: 900;
-    direction: ltr;
-    line-height: 1.1;
-  }
-
+  .res-label { font-size: 0.7rem; color: #888; font-weight: 700; }
+  .res-val { font-family: monospace; font-size: 1.5rem; font-weight: 900; direction: ltr; line-height: 1; }
+  
   .c-max { color: var(--danger); }
   .c-min { color: var(--primary); }
   .c-rng { color: var(--success); }
 
-  /* --- MAIN (אינפוטים) --- */
-  main {
-    flex: 1;
-    overflow-y: auto; /* גלילה פנימית אם ממש צריך */
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    /* מרווחים קטנים יותר */
-    gap: 12px; 
-  }
-
-  .input-group {
-    display: flex;
-    flex-direction: column;
-  }
-
-  label {
-    font-size: 0.85rem;
-    color: var(--muted);
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-
-  /* עיצוב אינפוט קומפקטי יותר */
-  input {
-    width: 100%;
-    background: #000;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    padding: 10px; /* פחות ריפוד */
-    font-size: 1.4rem; /* פונט גדול אבל לא ענק */
-    color: #fff;
-    font-family: monospace;
-    text-align: center;
-    direction: ltr;
-    outline: none;
-    font-weight: bold;
-    transition: all 0.2s;
-  }
-
-  input:focus {
-    background: #111;
-    border-color: #fff;
-  }
-
-  /* גריד לשדות תחתונים */
-  .split {
+  /* שורת כפתורים עליונה - ממוקמת מיד מתחת לתוצאות */
+  .top-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-  }
-
-  /* עיצוב מיוחד לשדות צבעוניים */
-  .inp-upper { border-color: rgba(255, 69, 58, 0.4); color: var(--danger); }
-  .inp-upper:focus { border-color: var(--danger); box-shadow: 0 0 10px rgba(255, 69, 58, 0.2); }
-  
-  .inp-lower { border-color: rgba(10, 132, 255, 0.4); color: var(--primary); }
-  .inp-lower:focus { border-color: var(--primary); box-shadow: 0 0 10px rgba(10, 132, 255, 0.2); }
-
-  /* --- BUTTONS --- */
-  /* הכפתורים נדחפים לתחתית אם יש מקום, או נשארים זמינים בגלילה */
-  .actions {
-    margin-top: auto; 
-    display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 2fr 1fr; /* כפתור חשב גדול יותר */
     gap: 10px;
-    padding-bottom: 5px; /* מרווח קטן מלמטה */
+    padding: 10px 12px 0 12px;
   }
 
   button {
     border: none;
-    border-radius: 10px;
-    padding: 14px; /* כפתור בגובה סביר */
-    font-size: 1rem;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 1.1rem;
     font-weight: 900;
     cursor: pointer;
     text-transform: uppercase;
@@ -155,68 +82,117 @@
   .btn-calc {
     background: var(--primary);
     color: white;
-    box-shadow: 0 4px 12px rgba(10, 132, 255, 0.3);
   }
-
+  
   .btn-reset {
-    background: #2c2c2e;
-    color: var(--muted);
-    border: 1px solid var(--border);
+    background: #333;
+    color: #ccc;
   }
 
-  button:active { transform: scale(0.97); }
+  /* --- אזור גלילה לאינפוטים (מתחת לכפתורים) --- */
+  main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .input-wrapper { display: flex; flex-direction: column; }
+  
+  label {
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+
+  input {
+    width: 100%;
+    background: #111;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 1.6rem;
+    color: #fff;
+    font-family: monospace;
+    text-align: center;
+    direction: ltr;
+    outline: none;
+    font-weight: bold;
+  }
+
+  input:focus {
+    border-color: var(--primary);
+    background: #000;
+  }
+
+  .split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+  }
+
+  /* צבעי מסגרת עדינים לאינפוטים */
+  #upper { color: var(--danger); }
+  #upper:focus { border-color: var(--danger); }
+  
+  #lower { color: var(--primary); }
+  #lower:focus { border-color: var(--primary); }
 
 </style>
 </head>
 <body>
 
-  <header>
+  <div class="safe-zone">
+    
     <div class="res-grid">
       <div class="res-box">
         <span class="res-label">MAX</span>
-        <span class="res-val c-max" id="dispMax">0.000</span>
+        <div class="res-val c-max" id="dispMax">0.000</div>
       </div>
       <div class="res-box">
         <span class="res-label">MIN</span>
-        <span class="res-val c-min" id="dispMin">0.000</span>
+        <div class="res-val c-min" id="dispMin">0.000</div>
       </div>
       <div class="res-box">
         <span class="res-label">RANGE</span>
-        <span class="res-val c-rng" id="dispRng">0.000</span>
+        <div class="res-val c-rng" id="dispRng">0.000</div>
       </div>
     </div>
-  </header>
+
+    <div class="top-actions">
+      <button class="btn-calc" onclick="commitCalc()">חשב</button>
+      <button class="btn-reset" onclick="resetAll()">אפס</button>
+    </div>
+
+  </div>
 
   <main>
-    
-    <div class="input-group">
+    <div class="input-wrapper">
       <label>NOMINAL</label>
       <input type="number" id="nominal" inputmode="decimal" step="any" placeholder="מידה">
     </div>
 
     <div class="split">
-      <div class="input-group">
-        <label style="color: var(--danger);">UPPER (+)</label>
-        <input type="number" id="upper" class="inp-upper" inputmode="decimal" step="any" placeholder="0.000">
+      <div class="input-wrapper">
+        <label>+ UPPER</label>
+        <input type="number" id="upper" inputmode="decimal" step="any" placeholder="0.000">
       </div>
-      <div class="input-group">
-        <label style="color: var(--primary);">LOWER (−)</label>
-        <input type="number" id="lower" class="inp-lower" inputmode="decimal" step="any" placeholder="0.000">
+      <div class="input-wrapper">
+        <label>− LOWER</label>
+        <input type="number" id="lower" inputmode="decimal" step="any" placeholder="0.000">
       </div>
     </div>
-
-    <div class="actions">
-      <button class="btn-calc" onclick="commitCalc()">חשב</button>
-      <button class="btn-reset" onclick="resetAll()">אפס</button>
-    </div>
-
+    
+    <div style="height: 200px;"></div>
   </main>
 
 <script>
   function safeVal(id) {
-    const val = document.getElementById(id).value;
-    if (!val) return 0;
-    return parseFloat(val);
+    const v = document.getElementById(id).value;
+    return v ? parseFloat(v) : 0;
   }
 
   function fmt(n) {
@@ -228,38 +204,28 @@
     const u = Math.abs(safeVal('upper'));
     const l = Math.abs(safeVal('lower'));
 
-    const max = n + u;
-    const min = n - l;
-    const rng = max - min;
-
-    document.getElementById('dispMax').innerText = fmt(max);
-    document.getElementById('dispMin').innerText = fmt(min);
-    document.getElementById('dispRng').innerText = fmt(rng);
+    document.getElementById('dispMax').innerText = fmt(n + u);
+    document.getElementById('dispMin').innerText = fmt(n - l);
+    document.getElementById('dispRng').innerText = fmt((n + u) - (n - l));
   }
 
   function commitCalc() {
     runLogic();
     // סגירת מקלדת
-    document.querySelectorAll('input').forEach(i => i.blur());
+    document.activeElement.blur();
   }
 
   function resetAll() {
     ['nominal', 'upper', 'lower'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('dispMax').innerText = "0.000";
-    document.getElementById('dispMin').innerText = "0.000";
-    document.getElementById('dispRng').innerText = "0.000";
+    runLogic(); // מאפס תצוגה
     document.getElementById('nominal').focus();
   }
 
-  // חיבור אירועים
+  // אירועים
   ['nominal', 'upper', 'lower'].forEach(id => {
     const el = document.getElementById(id);
     el.addEventListener('input', runLogic);
-    el.addEventListener('focus', function() { 
-      this.select();
-      // אופציונלי: גלילה קטנה כדי לוודא שהשדה במרכז
-      setTimeout(() => this.scrollIntoView({behavior: "smooth", block: "center"}), 100);
-    });
+    el.addEventListener('focus', function() { this.select(); });
   });
 </script>
 
