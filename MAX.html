@@ -27,132 +27,136 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* מונע גלילה של כל העמוד */
+    overflow: hidden; 
   }
 
-  /* --- אזור תוצאות עליון (קבוע) --- */
+  /* --- אזור תוצאות עליון (Head-Up Display) --- */
   .results-header {
-    flex: 0 0 auto; /* לא מתכווץ */
+    flex: 0 0 auto;
     background: var(--card);
-    padding: 15px;
+    padding: 10px;
     border-bottom: 2px solid var(--border);
     z-index: 100;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.7);
   }
 
   .res-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 8px;
+    align-items: stretch;
   }
 
   .res-box {
-    background: #2a2a2a;
-    border-radius: 8px;
-    padding: 10px 5px;
+    background: #252525;
+    border-radius: 10px;
+    padding: 10px 2px;
     text-align: center;
-    border: 1px solid #333;
+    border: 1px solid #3a3a3a;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .res-label {
-    display: block;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: #888;
-    font-weight: bold;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0;
   }
 
   .res-val {
-    display: block;
     font-family: monospace;
-    font-size: 1.25rem;
+    font-size: 2rem; /* גודל מקסימלי לקריאות */
     font-weight: 700;
-    direction: ltr; /* מספרים תמיד משמאל לימין */
+    line-height: 1.2;
+    direction: ltr;
+    letter-spacing: -1px;
   }
 
-  /* צבעים לתוצאות */
   .c-max { color: var(--danger); }
   .c-min { color: var(--primary); }
   .c-rng { color: var(--success); }
-
 
   /* --- אזור גלילה לאינפוטים --- */
   .scroll-area {
     flex: 1;
     overflow-y: auto;
     padding: 20px;
-    padding-bottom: 100px; /* מקום לכפתורים כשהמקלדת סגורה */
+    padding-bottom: 120px; /* מרווח ביטחון לגלילה */
   }
 
   .input-block {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
   }
 
   label {
     display: block;
-    font-size: 0.9rem;
-    color: #aaa;
+    font-size: 1rem;
+    color: #bbb;
     margin-bottom: 8px;
     font-weight: bold;
   }
 
-  /* שדות קלט גדולים וברורים */
   input {
     width: 100%;
     background: var(--input-bg);
-    border: 2px solid #333;
-    border-radius: 12px;
-    padding: 16px;
-    font-size: 1.6rem;
+    border: 2px solid #444;
+    border-radius: 14px;
+    padding: 18px;
+    font-size: 1.8rem;
     color: #fff;
     font-family: monospace;
     text-align: center;
-    direction: ltr; /* הקלדה משמאל לימין */
+    direction: ltr;
     outline: none;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
+    /* מונע זום אוטומטי באייפון */
+    font-weight: bold;
   }
 
   input:focus {
     border-color: var(--primary);
-    background: #111;
+    background: #0a0a0a;
+    box-shadow: 0 0 15px rgba(41, 121, 255, 0.2);
   }
-  
-  /* הדגשת צבעים לשדות הטולרנס */
-  #upper:focus { border-color: var(--danger); }
+
+  #upper:focus { border-color: var(--danger); box-shadow: 0 0 15px rgba(255, 23, 68, 0.2); }
   #lower:focus { border-color: var(--primary); }
 
   /* --- כפתורים --- */
   .btn-container {
     display: grid;
     gap: 15px;
-    margin-top: 10px;
+    margin-top: 25px;
   }
 
   button {
     width: 100%;
-    padding: 18px;
+    padding: 20px;
     border: none;
-    border-radius: 12px;
-    font-size: 1.1rem;
+    border-radius: 14px;
+    font-size: 1.2rem;
     font-weight: 900;
     cursor: pointer;
     text-transform: uppercase;
+    letter-spacing: 1px;
   }
 
   .btn-calc {
-    background: linear-gradient(90deg, #2196F3, #1976D2);
+    background: linear-gradient(135deg, #2979ff, #1565c0);
     color: white;
-    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+    box-shadow: 0 6px 20px rgba(41, 121, 255, 0.4);
   }
   
   .btn-calc:active { transform: scale(0.98); }
 
   .btn-reset {
     background: #333;
-    color: #bbb;
+    color: #ccc;
   }
-
 </style>
 </head>
 <body>
@@ -178,17 +182,17 @@
     
     <div class="input-block">
       <label>NOMINAL (נומינלי)</label>
-      <input type="number" id="nominal" inputmode="decimal" placeholder="הכנס מידה">
+      <input type="number" id="nominal" inputmode="decimal" step="any" placeholder="הכנס מידה">
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
       <div class="input-block">
         <label>+ UPPER</label>
-        <input type="number" id="upper" inputmode="decimal" placeholder="0.000" style="color: #ff8a80;">
+        <input type="number" id="upper" inputmode="decimal" step="any" placeholder="0.000" style="color: #ff8a80;">
       </div>
       <div class="input-block">
         <label>− LOWER</label>
-        <input type="number" id="lower" inputmode="decimal" placeholder="0.000" style="color: #82b1ff;">
+        <input type="number" id="lower" inputmode="decimal" step="any" placeholder="0.000" style="color: #82b1ff;">
       </div>
     </div>
 
@@ -200,56 +204,56 @@
   </div>
 
 <script>
-  // פונקציית עזר לפרמוט
-  function fmt(num) {
-    return num.toFixed(3);
+  // פונקציה לטיפול בבעיות דיוק של מחשבים (Floating Point Precision)
+  // היא מעגלת ל-3 ספרות עשרוניות בצורה מדויקת למניעת שגיאות כמו 10.0000001
+  function preciseRound(num) {
+    return (Math.round((num + Number.EPSILON) * 1000) / 1000).toFixed(3);
   }
 
-  // הפונקציה הראשית
   function calculateCore() {
-    // שליפת ערכים
     const nomVal = document.getElementById('nominal').value;
     const upVal = document.getElementById('upper').value;
     const lowVal = document.getElementById('lower').value;
 
+    // המרת קלט למספר, ברירת מחדל 0 אם ריק
     const n = nomVal ? parseFloat(nomVal) : 0;
-    const u = upVal ? parseFloat(upVal) : 0;
-    const l = lowVal ? parseFloat(lowVal) : 0;
+    
+    // אבטחת קלט: לוקח תמיד את הערך המוחלט (Math.abs)
+    // כך שגם אם המשתמש הקיש "-0.05" במינוס, המערכת תבין שהכוונה להפחית 0.05
+    const u = Math.abs(parseFloat(upVal) || 0); 
+    const l = Math.abs(parseFloat(lowVal) || 0);
 
-    // חישוב
+    // חישוב מדויק
     const max = n + u;
-    const min = n - l; // הנחה שהמשתמש מכניס 0.1 ולא -0.1. אם הוא מכניס מינוס, זה יהפוך לפלוס. 
-                       // לרוב בבקרת איכות מכניסים את הערך המוחלט של הטולרנס.
-    const range = Math.abs(max - min);
+    const min = n - l;
+    const range = max - min;
 
-    // עדכון למעלה
-    document.getElementById('dispMax').innerText = fmt(max);
-    document.getElementById('dispMin').innerText = fmt(min);
-    document.getElementById('dispRng').innerText = fmt(range);
+    // עדכון התצוגה עם עיגול בטוח
+    document.getElementById('dispMax').innerText = preciseRound(max);
+    document.getElementById('dispMin').innerText = preciseRound(min);
+    document.getElementById('dispRng').innerText = preciseRound(range);
   }
 
-  // פונקציה לכפתור "חשב" - גם מחשבת וגם סוגרת מקלדת
   function doCalculate() {
     calculateCore();
-    // סגירת מקלדת (Blur לכל השדות)
+    // סגירת מקלדת בצורה חלקה
     document.getElementById('nominal').blur();
     document.getElementById('upper').blur();
     document.getElementById('lower').blur();
   }
 
-  // חישוב בזמן אמת (אופציונלי - אם רוצים שזה יתעדכן תוך כדי הקלדה)
+  // חישוב אוטומטי בזמן הקלדה (אופציונלי - משפר חוויה)
   const inputs = ['nominal', 'upper', 'lower'];
   inputs.forEach(id => {
     document.getElementById(id).addEventListener('input', calculateCore);
   });
 
-  // איפוס
   function resetAll() {
     inputs.forEach(id => document.getElementById(id).value = '');
     document.getElementById('dispMax').innerText = "0.000";
     document.getElementById('dispMin').innerText = "0.000";
     document.getElementById('dispRng').innerText = "0.000";
-    document.getElementById('nominal').focus(); // מחזיר פוקוס להתחלה
+    document.getElementById('nominal').focus(); // מחזיר פוקוס לשדה הראשון
   }
 </script>
 
