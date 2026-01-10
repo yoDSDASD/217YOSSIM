@@ -3,14 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>QC Calc Pro</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
+<title>QC Pro Calc</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-color: #121212;
-    --card-bg: #1e1e1e;
-    --primary: #2196F3;
-    --danger: #ff5252;
+    --bg: #121212;
+    --card: #1e1e1e;
+    --input-bg: #000000;
+    --primary: #2979ff;
+    --danger: #ff1744;
+    --success: #00e676;
     --text: #ffffff;
     --border: #333;
   }
@@ -19,245 +21,235 @@
 
   body {
     margin: 0;
-    padding: 0;
     font-family: "Heebo", sans-serif;
-    background-color: var(--bg-color);
+    background-color: var(--bg);
     color: var(--text);
     height: 100vh;
-    overflow: hidden; /* מונע גלילה מיותרת */
     display: flex;
     flex-direction: column;
+    overflow: hidden; /* מונע גלילה של כל העמוד */
   }
 
-  /* אזור עליון קבוע - תוצאות */
-  .top-section {
-    flex: 0 0 auto;
-    background: var(--card-bg);
-    padding: 10px 20px;
-    border-bottom: 1px solid var(--border);
-    z-index: 10;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  /* --- אזור תוצאות עליון (קבוע) --- */
+  .results-header {
+    flex: 0 0 auto; /* לא מתכווץ */
+    background: var(--card);
+    padding: 15px;
+    border-bottom: 2px solid var(--border);
+    z-index: 100;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.6);
   }
 
-  .app-title {
-    font-size: 0.9rem;
-    color: #888;
-    text-align: center;
-    margin-bottom: 5px;
-  }
-
-  .result-grid {
+  .res-grid {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    text-align: center;
+    gap: 8px;
   }
 
   .res-box {
-    background: #2c2c2c;
+    background: #2a2a2a;
     border-radius: 8px;
-    padding: 8px 4px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    padding: 10px 5px;
+    text-align: center;
+    border: 1px solid #333;
   }
 
-  .res-label { font-size: 0.75rem; color: #aaa; font-weight: bold; }
-  .res-value { font-size: 1.1rem; font-family: monospace; font-weight: bold; margin-top: 2px; }
-  
+  .res-label {
+    display: block;
+    font-size: 0.7rem;
+    color: #888;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+  }
+
+  .res-val {
+    display: block;
+    font-family: monospace;
+    font-size: 1.25rem;
+    font-weight: 700;
+    direction: ltr; /* מספרים תמיד משמאל לימין */
+  }
+
+  /* צבעים לתוצאות */
   .c-max { color: var(--danger); }
   .c-min { color: var(--primary); }
-  .c-rng { color: #00E676; }
+  .c-rng { color: var(--success); }
 
-  /* אזור גלילה לאינפוטים */
-  .scroll-content {
+
+  /* --- אזור גלילה לאינפוטים --- */
+  .scroll-area {
     flex: 1;
     overflow-y: auto;
     padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* מצמיד למעלה */
+    padding-bottom: 100px; /* מקום לכפתורים כשהמקלדת סגורה */
   }
 
-  .input-group {
-    margin-bottom: 15px;
-    position: relative;
+  .input-block {
+    margin-bottom: 20px;
   }
 
   label {
     display: block;
-    font-size: 0.85rem;
-    color: #888;
-    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #aaa;
+    margin-bottom: 8px;
     font-weight: bold;
   }
 
-  /* עיצוב האינפוט המיוחד */
+  /* שדות קלט גדולים וברורים */
   input {
     width: 100%;
-    background: #000;
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    padding: 15px;
-    font-size: 1.5rem;
+    background: var(--input-bg);
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 1.6rem;
     color: #fff;
     font-family: monospace;
     text-align: center;
-    direction: ltr; /* משאיר מספרים מסודרים */
+    direction: ltr; /* הקלדה משמאל לימין */
     outline: none;
-    caret-color: transparent; /* מסתיר את הסמן המהבהב */
+    transition: border-color 0.2s;
   }
 
   input:focus {
     border-color: var(--primary);
-    background: #1a1a1a;
+    background: #111;
+  }
+  
+  /* הדגשת צבעים לשדות הטולרנס */
+  #upper:focus { border-color: var(--danger); }
+  #lower:focus { border-color: var(--primary); }
+
+  /* --- כפתורים --- */
+  .btn-container {
+    display: grid;
+    gap: 15px;
+    margin-top: 10px;
   }
 
-  /* כפתור איפוס צף וקטן */
-  .reset-btn {
-    margin-top: auto; /* דוחף למטה אם יש מקום */
-    background: #333;
-    color: #fff;
-    border: none;
-    padding: 15px;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
+  button {
     width: 100%;
+    padding: 18px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 900;
+    cursor: pointer;
+    text-transform: uppercase;
   }
+
+  .btn-calc {
+    background: linear-gradient(90deg, #2196F3, #1976D2);
+    color: white;
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.4);
+  }
+  
+  .btn-calc:active { transform: scale(0.98); }
+
+  .btn-reset {
+    background: #333;
+    color: #bbb;
+  }
+
 </style>
 </head>
 <body>
 
-<div class="top-section">
-  <div class="app-title">QC CALCULATOR</div>
-  <div class="result-grid">
-    <div class="res-box">
-      <span class="res-label">MAX</span>
-      <span class="res-value c-max" id="resMax">0.000</span>
-    </div>
-    <div class="res-box">
-      <span class="res-label">MIN</span>
-      <span class="res-value c-min" id="resMin">0.000</span>
-    </div>
-    <div class="res-box">
-      <span class="res-label">RANGE</span>
-      <span class="res-value c-rng" id="resRng">0.000</span>
-    </div>
-  </div>
-</div>
-
-<div class="scroll-content">
-  
-  <div class="input-group">
-    <label>NOMINAL</label>
-    <input type="tel" id="nom" inputmode="numeric" placeholder="0.000" onfocus="this.value = this.value">
-  </div>
-
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-    <div class="input-group">
-      <label>+ UPPER</label>
-      <input type="tel" id="upper" inputmode="numeric" placeholder="0.000" style="color:var(--danger)">
-    </div>
-    <div class="input-group">
-      <label>− LOWER</label>
-      <input type="tel" id="lower" inputmode="numeric" placeholder="0.000" style="color:var(--primary)">
+  <div class="results-header">
+    <div class="res-grid">
+      <div class="res-box">
+        <span class="res-label">MAX</span>
+        <span class="res-val c-max" id="dispMax">0.000</span>
+      </div>
+      <div class="res-box">
+        <span class="res-label">MIN</span>
+        <span class="res-val c-min" id="dispMin">0.000</span>
+      </div>
+      <div class="res-box">
+        <span class="res-label">RANGE</span>
+        <span class="res-val c-rng" id="dispRng">0.000</span>
+      </div>
     </div>
   </div>
 
-  <button class="reset-btn" onclick="resetAll()">RESET / איפוס</button>
+  <div class="scroll-area">
+    
+    <div class="input-block">
+      <label>NOMINAL (נומינלי)</label>
+      <input type="number" id="nominal" inputmode="decimal" placeholder="הכנס מידה">
+    </div>
 
-</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+      <div class="input-block">
+        <label>+ UPPER</label>
+        <input type="number" id="upper" inputmode="decimal" placeholder="0.000" style="color: #ff8a80;">
+      </div>
+      <div class="input-block">
+        <label>− LOWER</label>
+        <input type="number" id="lower" inputmode="decimal" placeholder="0.000" style="color: #82b1ff;">
+      </div>
+    </div>
+
+    <div class="btn-container">
+      <button class="btn-calc" onclick="doCalculate()">חשב תוצאה</button>
+      <button class="btn-reset" onclick="resetAll()">נקה הכל</button>
+    </div>
+
+  </div>
 
 <script>
-  // מחזיק את הערכים הגולמיים (למשל '123' עבור 0.123)
-  const state = {
-    nom: '',
-    upper: '',
-    lower: ''
-  };
+  // פונקציית עזר לפרמוט
+  function fmt(num) {
+    return num.toFixed(3);
+  }
 
-  const inputs = ['nom', 'upper', 'lower'];
+  // הפונקציה הראשית
+  function calculateCore() {
+    // שליפת ערכים
+    const nomVal = document.getElementById('nominal').value;
+    const upVal = document.getElementById('upper').value;
+    const lowVal = document.getElementById('lower').value;
 
+    const n = nomVal ? parseFloat(nomVal) : 0;
+    const u = upVal ? parseFloat(upVal) : 0;
+    const l = lowVal ? parseFloat(lowVal) : 0;
+
+    // חישוב
+    const max = n + u;
+    const min = n - l; // הנחה שהמשתמש מכניס 0.1 ולא -0.1. אם הוא מכניס מינוס, זה יהפוך לפלוס. 
+                       // לרוב בבקרת איכות מכניסים את הערך המוחלט של הטולרנס.
+    const range = Math.abs(max - min);
+
+    // עדכון למעלה
+    document.getElementById('dispMax').innerText = fmt(max);
+    document.getElementById('dispMin').innerText = fmt(min);
+    document.getElementById('dispRng').innerText = fmt(range);
+  }
+
+  // פונקציה לכפתור "חשב" - גם מחשבת וגם סוגרת מקלדת
+  function doCalculate() {
+    calculateCore();
+    // סגירת מקלדת (Blur לכל השדות)
+    document.getElementById('nominal').blur();
+    document.getElementById('upper').blur();
+    document.getElementById('lower').blur();
+  }
+
+  // חישוב בזמן אמת (אופציונלי - אם רוצים שזה יתעדכן תוך כדי הקלדה)
+  const inputs = ['nominal', 'upper', 'lower'];
   inputs.forEach(id => {
-    const el = document.getElementById(id);
-    
-    // מאזין להקלדה
-    el.addEventListener('keydown', (e) => {
-      e.preventDefault(); // מבטל התנהגות רגילה של הדפדפן
-
-      let currentRaw = state[id];
-
-      // זיהוי מספרים (0-9)
-      if (e.key >= '0' && e.key <= '9') {
-        // מגבלה סבירה שלא יקלידו אינסוף
-        if (currentRaw.length < 9) {
-          currentRaw += e.key;
-        }
-      } 
-      // זיהוי מחיקה (Backspace)
-      else if (e.key === 'Backspace') {
-        currentRaw = currentRaw.slice(0, -1);
-      }
-      
-      // שמירת מצב חדש
-      state[id] = currentRaw;
-      
-      // עדכון תצוגה
-      updateDisplay(el, currentRaw);
-      calculate();
-    });
-
-    // טיפול בלחיצה כדי שלא יקפוץ סמן
-    el.addEventListener('click', () => {
-      // ממקם את הסמן בסוף תמיד (למרות שהוא מוסתר)
-      el.setSelectionRange(el.value.length, el.value.length);
-    });
+    document.getElementById(id).addEventListener('input', calculateCore);
   });
 
-  function updateDisplay(el, rawVal) {
-    if (!rawVal) {
-      el.value = ""; // מראה Placeholder
-      return;
-    }
-    const num = parseInt(rawVal, 10);
-    // חלוקה ב-1000 כדי לקבל 3 ספרות אחרי הנקודה
-    const formatted = (num / 1000).toFixed(3);
-    el.value = formatted;
-  }
-
-  function calculate() {
-    // המרה למספרים ממשיים לצורך חישוב
-    const n = state.nom ? parseInt(state.nom, 10) / 1000 : 0;
-    const u = state.upper ? parseInt(state.upper, 10) / 1000 : 0;
-    const l = state.lower ? parseInt(state.lower, 10) / 1000 : 0;
-
-    // אם אין נומינלי, אל תציג שטויות, או תציג אפסים
-    if (n === 0 && u === 0 && l === 0) {
-      document.getElementById('resMax').textContent = "0.000";
-      document.getElementById('resMin').textContent = "0.000";
-      document.getElementById('resRng').textContent = "0.000";
-      return;
-    }
-
-    const max = n + u;
-    const min = n - l;
-    const rng = max - min;
-
-    document.getElementById('resMax').textContent = max.toFixed(3);
-    document.getElementById('resMin').textContent = min.toFixed(3);
-    document.getElementById('resRng').textContent = rng.toFixed(3);
-  }
-
+  // איפוס
   function resetAll() {
-    state.nom = '';
-    state.upper = '';
-    state.lower = '';
-    inputs.forEach(id => {
-      document.getElementById(id).value = '';
-    });
-    calculate();
+    inputs.forEach(id => document.getElementById(id).value = '');
+    document.getElementById('dispMax').innerText = "0.000";
+    document.getElementById('dispMin').innerText = "0.000";
+    document.getElementById('dispRng').innerText = "0.000";
+    document.getElementById('nominal').focus(); // מחזיר פוקוס להתחלה
   }
 </script>
 
