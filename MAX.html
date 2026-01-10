@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>QC MASTER COMPACT</title>
+<title>QC STATIC PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -24,21 +24,31 @@
     background-color: var(--bg);
     color: var(--text);
     font-family: "Heebo", sans-serif;
-    height: 100vh;
-    overflow: hidden;
+    height: 100dvh;
+    overflow: hidden; /* נועל את הגוף מתזוזה */
+    display: flex;
+    flex-direction: column;
   }
 
-  /* --- הברזל העליון (דחוס יותר) --- */
-  .top-deck {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
+  /* --- הכל עטוף בקונטיינר אחד שצמוד למעלה --- */
+  .app-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    /* זה הסוד: הכל צפוף למעלה, שום דבר לא צף */
+    justify-content: flex-start; 
+    gap: 10px;
+    padding-bottom: 20px;
+  }
+
+  /* --- חלק 1: תוצאות + כפתורים (מקובע) --- */
+  .header-unit {
     background: var(--panel);
     border-bottom: 1px solid var(--border);
-    z-index: 9999;
-    padding-bottom: 10px; /* צומצם מ-15 */
-    box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+    padding-bottom: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
   }
 
   /* גריד תוצאות */
@@ -47,19 +57,19 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: 1px;
     background: #333;
-    margin-bottom: 8px; /* צומצם מ-12 */
+    margin-bottom: 8px;
   }
 
   .hud-cell {
     background: var(--panel);
-    padding: 8px 2px; /* צומצם מ-12 */
+    padding: 8px 2px;
     text-align: center;
   }
 
-  .hud-label { font-size: 0.7rem; color: #666; font-weight: 700; letter-spacing: 1px; }
+  .hud-label { font-size: 0.65rem; color: #777; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 0; }
   .hud-val { 
     font-family: 'Roboto Mono', monospace; 
-    font-size: 1.6rem; /* הוקטן מעט להתאמה */
+    font-size: 1.4rem; 
     font-weight: 700; 
     direction: ltr;
     line-height: 1.1;
@@ -69,19 +79,19 @@
   .c-min { color: var(--primary); }
   .c-rng { color: var(--success); }
 
-  /* כפתורים דחוסים */
+  /* כפתורים */
   .actions {
     display: flex;
-    gap: 8px; /* צומצם מ-10 */
-    padding: 0 10px; /* צומצם מ-15 */
+    gap: 8px;
+    padding: 0 10px;
   }
 
   button {
     flex: 1;
     border: none;
-    border-radius: 8px;
-    padding: 10px; /* צומצם מ-14 */
-    font-size: 1.1rem;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 1rem;
     font-weight: 900;
     cursor: pointer;
   }
@@ -89,65 +99,79 @@
   .btn-calc { background: var(--primary); color: white; flex: 2; }
   .btn-reset { background: #333; color: #ccc; flex: 1; }
 
-  /* --- אזור גלילה לאינפוטים --- */
-  .scroll-area {
-    /* ה-margin-top מחושב אוטומטית ב-JS, אבל נשים ברירת מחדל */
-    margin-top: 150px; 
-    height: calc(100vh - 150px);
-    overflow-y: auto;
-    padding: 15px;
-    
-    /* מרווח תחתון ענק לגלילה מעל המקלדת */
-    padding-bottom: 60vh; 
+
+  /* --- חלק 2: אינפוטים (צמודים לראש, לא זזים) --- */
+  .inputs-unit {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* רווח קבוע בין נומינל לפלוס/מינוס */
   }
 
-  .field-row { margin-bottom: 25px; }
+  .field-row {
+    position: relative;
+  }
 
-  .big-symbol {
+  .label-sm {
+    font-size: 0.75rem;
+    color: #888;
+    font-weight: 700;
+    margin-bottom: 4px;
     display: block;
-    text-align: center;
-    font-size: 3rem; /* הוקטן מעט */
-    line-height: 0.8;
-    font-weight: 900;
-    margin-bottom: 8px;
   }
 
-  .sym-plus { color: var(--danger); }
-  .sym-minus { color: var(--primary); }
-  .sym-nom { font-size: 0.9rem; color: #888; letter-spacing: 1px; line-height: 1.5; margin-bottom: 5px; }
-
+  /* שדה הנומינל */
   input {
     width: 100%;
     background: #000;
-    border: 2px solid #333;
-    border-radius: 10px;
-    padding: 12px; /* צומצם מ-16 */
-    font-size: 2rem;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 0; /* איפוס ריפוד */
+    height: 50px; /* גובה קבוע */
+    line-height: 50px;
+    font-size: 1.8rem;
     color: #fff;
     font-family: 'Roboto Mono', monospace;
     text-align: center;
     direction: ltr;
     outline: none;
     font-weight: bold;
-    transition: 0.2s;
   }
 
   input::placeholder { color: var(--placeholder); opacity: 1; }
-  input:focus { border-color: #fff; background: #0a0a0a; }
+  input:focus { border-color: #fff; background: #0a0a0a; border-width: 2px; }
+  
   .inp-red:focus { border-color: var(--danger); }
   .inp-blue:focus { border-color: var(--primary); }
 
+  /* אזור הפלוס מינוס */
   .split {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 10px;
   }
+
+  .symbol-overlay {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5rem;
+    font-weight: 900;
+    pointer-events: none; /* כדי שאפשר יהיה ללחוץ דרכו */
+  }
+  
+  /* מיקום הסימנים בתוך השדה כדי לחסוך מקום */
+  .sym-pos-right { right: 10px; } 
+  .sym-plus { color: var(--danger); }
+  .sym-minus { color: var(--primary); }
 
 </style>
 </head>
 <body>
 
-  <div class="top-deck" id="topDeck">
+<div class="app-container">
+  
+  <div class="header-unit">
     <div class="hud">
       <div class="hud-cell">
         <div class="hud-label">MAX</div>
@@ -169,38 +193,32 @@
     </div>
   </div>
 
-  <div class="scroll-area">
+  <div class="inputs-unit">
     
     <div class="field-row">
-      <div class="big-symbol sym-nom">NOMINAL</div>
+      <span class="label-sm">NOMINAL</span>
       <input type="number" id="nominal" inputmode="decimal" step="any" placeholder="0.000">
     </div>
 
     <div class="split">
-      <div>
-        <div class="big-symbol sym-plus">+</div>
+      <div class="field-row">
+        <span class="symbol-overlay sym-pos-right sym-plus">+</span>
         <input type="number" id="upper" class="inp-red" inputmode="decimal" step="any" placeholder="0.000">
       </div>
 
-      <div>
-        <div class="big-symbol sym-minus">−</div>
+      <div class="field-row">
+        <span class="symbol-overlay sym-pos-right sym-minus">−</span>
         <input type="number" id="lower" class="inp-blue" inputmode="decimal" step="any" placeholder="0.000">
       </div>
     </div>
 
   </div>
+  
+  <div style="flex: 1;"></div>
+
+</div>
 
 <script>
-  // חישוב גובה דינמי מדויק
-  function adjustLayout() {
-    const deckHeight = document.getElementById('topDeck').offsetHeight;
-    document.querySelector('.scroll-area').style.marginTop = deckHeight + 'px';
-    document.querySelector('.scroll-area').style.height = `calc(100vh - ${deckHeight}px)`;
-  }
-  
-  window.addEventListener('resize', adjustLayout);
-  window.addEventListener('load', adjustLayout);
-
   function getVal(id) {
     const v = document.getElementById(id).value;
     return v ? parseFloat(v) : 0;
@@ -236,12 +254,7 @@
   ['nominal', 'upper', 'lower'].forEach(id => {
     const el = document.getElementById(id);
     el.addEventListener('input', calc);
-    el.addEventListener('focus', function() { 
-      this.select();
-      setTimeout(() => {
-        el.scrollIntoView({behavior: "smooth", block: "center"});
-      }, 300);
-    });
+    el.addEventListener('focus', function() { this.select(); });
   });
 </script>
 
