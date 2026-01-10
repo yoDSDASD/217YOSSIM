@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>QC MASTER FIXED</title>
+<title>QC MASTER COMPACT</title>
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@500;700&family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -25,19 +25,19 @@
     color: var(--text);
     font-family: "Heebo", sans-serif;
     height: 100vh;
-    overflow: hidden; /* מונע גלילה של הגוף עצמו */
+    overflow: hidden;
   }
 
-  /* --- הלב של הפתרון: נעילה פיזית למעלה --- */
+  /* --- הברזל העליון (דחוס יותר) --- */
   .top-deck {
-    position: fixed; /* זה הסוד - לא זז בחיים */
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     background: var(--panel);
     border-bottom: 1px solid var(--border);
-    z-index: 9999; /* תמיד מעל הכל */
-    padding-bottom: 15px;
+    z-index: 9999;
+    padding-bottom: 10px; /* צומצם מ-15 */
     box-shadow: 0 10px 40px rgba(0,0,0,0.9);
   }
 
@@ -47,19 +47,19 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: 1px;
     background: #333;
-    margin-bottom: 12px;
+    margin-bottom: 8px; /* צומצם מ-12 */
   }
 
   .hud-cell {
     background: var(--panel);
-    padding: 12px 2px;
+    padding: 8px 2px; /* צומצם מ-12 */
     text-align: center;
   }
 
-  .hud-label { font-size: 0.75rem; color: #666; font-weight: 700; letter-spacing: 1px; }
+  .hud-label { font-size: 0.7rem; color: #666; font-weight: 700; letter-spacing: 1px; }
   .hud-val { 
     font-family: 'Roboto Mono', monospace; 
-    font-size: 1.7rem; 
+    font-size: 1.6rem; /* הוקטן מעט להתאמה */
     font-weight: 700; 
     direction: ltr;
     line-height: 1.1;
@@ -69,19 +69,19 @@
   .c-min { color: var(--primary); }
   .c-rng { color: var(--success); }
 
-  /* כפתורים */
+  /* כפתורים דחוסים */
   .actions {
     display: flex;
-    gap: 10px;
-    padding: 0 15px;
+    gap: 8px; /* צומצם מ-10 */
+    padding: 0 10px; /* צומצם מ-15 */
   }
 
   button {
     flex: 1;
     border: none;
     border-radius: 8px;
-    padding: 14px;
-    font-size: 1.2rem;
+    padding: 10px; /* צומצם מ-14 */
+    font-size: 1.1rem;
     font-weight: 900;
     cursor: pointer;
   }
@@ -91,38 +91,38 @@
 
   /* --- אזור גלילה לאינפוטים --- */
   .scroll-area {
-    /* דוחף את התוכן למטה כדי שלא יוסתר ע"י ה-Header הקבוע */
-    margin-top: 180px; 
-    height: calc(100vh - 180px);
+    /* ה-margin-top מחושב אוטומטית ב-JS, אבל נשים ברירת מחדל */
+    margin-top: 150px; 
+    height: calc(100vh - 150px);
     overflow-y: auto;
-    padding: 20px;
+    padding: 15px;
     
-    /* מרווח תחתון ענק כדי לאפשר גלילה מעל המקלדת */
+    /* מרווח תחתון ענק לגלילה מעל המקלדת */
     padding-bottom: 60vh; 
   }
 
-  .field-row { margin-bottom: 30px; }
+  .field-row { margin-bottom: 25px; }
 
   .big-symbol {
     display: block;
     text-align: center;
-    font-size: 3.5rem;
+    font-size: 3rem; /* הוקטן מעט */
     line-height: 0.8;
     font-weight: 900;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
 
   .sym-plus { color: var(--danger); }
   .sym-minus { color: var(--primary); }
-  .sym-nom { font-size: 1rem; color: #888; letter-spacing: 1px; line-height: 1.5; margin-bottom: 5px; }
+  .sym-nom { font-size: 0.9rem; color: #888; letter-spacing: 1px; line-height: 1.5; margin-bottom: 5px; }
 
   input {
     width: 100%;
     background: #000;
     border: 2px solid #333;
-    border-radius: 12px;
-    padding: 16px;
-    font-size: 2.2rem; /* ענק וברור */
+    border-radius: 10px;
+    padding: 12px; /* צומצם מ-16 */
+    font-size: 2rem;
     color: #fff;
     font-family: 'Roboto Mono', monospace;
     text-align: center;
@@ -140,7 +140,7 @@
   .split {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 15px;
   }
 
 </style>
@@ -191,7 +191,7 @@
   </div>
 
 <script>
-  // חישוב גובה דינמי כדי שהתוכן לא יוסתר בהתחלה
+  // חישוב גובה דינמי מדויק
   function adjustLayout() {
     const deckHeight = document.getElementById('topDeck').offsetHeight;
     document.querySelector('.scroll-area').style.marginTop = deckHeight + 'px';
@@ -238,7 +238,6 @@
     el.addEventListener('input', calc);
     el.addEventListener('focus', function() { 
       this.select();
-      // דואג שהשדה יגלול למרכז המסך, מתחת לכותרת הקבועה
       setTimeout(() => {
         el.scrollIntoView({behavior: "smooth", block: "center"});
       }, 300);
