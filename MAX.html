@@ -3,253 +3,261 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>By Yosef M | QC Calc</title>
-<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+<title>QC Calc Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg-color: #121212;
     --card-bg: #1e1e1e;
     --primary: #2196F3;
-    --primary-hover: #1976D2;
-    --accent: #00E676;
-    --text-main: #ffffff;
-    --text-sec: #b0b0b0;
-    --border: #333;
-    --input-bg: #2c2c2c;
     --danger: #ff5252;
+    --text: #ffffff;
+    --border: #333;
   }
 
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  
+
   body {
     margin: 0;
+    padding: 0;
     font-family: "Heebo", sans-serif;
     background-color: var(--bg-color);
-    color: var(--text-main);
+    color: var(--text);
+    height: 100vh;
+    overflow: hidden; /* מונע גלילה מיותרת */
     display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    flex-direction: column;
   }
 
-  .app-container {
-    width: 100%;
-    max-width: 400px;
+  /* אזור עליון קבוע - תוצאות */
+  .top-section {
+    flex: 0 0 auto;
     background: var(--card-bg);
-    padding: 2rem;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    margin: 1rem;
-  }
-
-  .header {
-    text-align: center;
-    margin-bottom: 2rem;
+    padding: 10px 20px;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 1rem;
+    z-index: 10;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
   }
 
-  .header h1 {
-    margin: 0;
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    color: var(--primary);
-  }
-  
-  .header span {
-    font-size: 0.8rem;
-    color: var(--text-sec);
-    text-transform: uppercase;
-  }
-
-  .input-grid {
-    display: grid;
-    gap: 1.2rem;
-  }
-
-  .input-wrapper {
-    position: relative;
-  }
-
-  .input-wrapper label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--text-sec);
-    font-weight: 500;
-  }
-
-  .input-wrapper input {
-    width: 100%;
-    background: var(--input-bg);
-    border: 2px solid transparent;
-    border-radius: 12px;
-    padding: 12px;
-    font-size: 1.2rem;
-    color: #fff;
-    font-family: monospace;
+  .app-title {
+    font-size: 0.9rem;
+    color: #888;
     text-align: center;
-    transition: all 0.3s ease;
-    outline: none;
+    margin-bottom: 5px;
   }
 
-  .input-wrapper input:focus {
-    border-color: var(--primary);
-    background: #333;
-    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
-  }
-
-  .actions {
-    margin-top: 2rem;
+  .result-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 1rem;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    text-align: center;
   }
 
-  button {
-    border: none;
-    padding: 14px;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: transform 0.1s, opacity 0.2s;
-  }
-
-  button:active { transform: scale(0.96); }
-
-  .btn-calc {
-    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
-    color: white;
-    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
-  }
-
-  .btn-reset {
-    background: var(--input-bg);
-    color: var(--text-sec);
-  }
-
-  .result-card {
-    margin-top: 2rem;
-    background: #252525;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    overflow: hidden;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: none;
-  }
-
-  .result-card.show {
-    opacity: 1;
-    transform: translateY(0);
-    display: block;
-  }
-
-  .result-row {
+  .res-box {
+    background: #2c2c2c;
+    border-radius: 8px;
+    padding: 8px 4px;
     display: flex;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    font-family: monospace;
-    font-size: 1.1rem;
+    flex-direction: column;
+    align-items: center;
   }
 
-  .result-row:last-child { border-bottom: none; }
-  
-  .label-text { font-weight: bold; }
-  .val-text { font-weight: normal; }
+  .res-label { font-size: 0.75rem; color: #aaa; font-weight: bold; }
+  .res-value { font-size: 1.1rem; font-family: monospace; font-weight: bold; margin-top: 2px; }
   
   .c-max { color: var(--danger); }
   .c-min { color: var(--primary); }
-  .c-rng { color: var(--accent); }
+  .c-rng { color: #00E676; }
 
+  /* אזור גלילה לאינפוטים */
+  .scroll-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* מצמיד למעלה */
+  }
+
+  .input-group {
+    margin-bottom: 15px;
+    position: relative;
+  }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+
+  /* עיצוב האינפוט המיוחד */
+  input {
+    width: 100%;
+    background: #000;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 1.5rem;
+    color: #fff;
+    font-family: monospace;
+    text-align: center;
+    direction: ltr; /* משאיר מספרים מסודרים */
+    outline: none;
+    caret-color: transparent; /* מסתיר את הסמן המהבהב */
+  }
+
+  input:focus {
+    border-color: var(--primary);
+    background: #1a1a1a;
+  }
+
+  /* כפתור איפוס צף וקטן */
+  .reset-btn {
+    margin-top: auto; /* דוחף למטה אם יש מקום */
+    background: #333;
+    color: #fff;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+  }
 </style>
 </head>
 <body>
 
-<div class="app-container">
-  <div class="header">
-    <h1>TOLERANCE</h1>
-    <span>By Yosef M</span>
-  </div>
-
-  <div class="input-grid">
-    <div class="input-wrapper">
-      <label>NOMINAL (מידה נומינלית)</label>
-      <input type="number" id="nominal" inputmode="decimal" placeholder="0.000">
+<div class="top-section">
+  <div class="app-title">QC CALCULATOR</div>
+  <div class="result-grid">
+    <div class="res-box">
+      <span class="res-label">MAX</span>
+      <span class="res-value c-max" id="resMax">0.000</span>
     </div>
-    
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-      <div class="input-wrapper">
-        <label>+ UPPER (+)</label>
-        <input type="number" id="upperTol" inputmode="decimal" placeholder="0.000" style="color: var(--danger);">
-      </div>
-      <div class="input-wrapper">
-        <label>− LOWER (−)</label>
-        <input type="number" id="lowerTol" inputmode="decimal" placeholder="0.000" style="color: var(--primary);">
-      </div>
+    <div class="res-box">
+      <span class="res-label">MIN</span>
+      <span class="res-value c-min" id="resMin">0.000</span>
     </div>
-  </div>
-
-  <div class="result-card" id="resultCard">
+    <div class="res-box">
+      <span class="res-label">RANGE</span>
+      <span class="res-value c-rng" id="resRng">0.000</span>
     </div>
-
-  <div class="actions">
-    <button class="btn-calc" onclick="calculate()">חשב תוצאה</button>
-    <button class="btn-reset" onclick="resetCalc()">איפוס</button>
   </div>
 </div>
 
+<div class="scroll-content">
+  
+  <div class="input-group">
+    <label>NOMINAL</label>
+    <input type="tel" id="nom" inputmode="numeric" placeholder="0.000" onfocus="this.value = this.value">
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+    <div class="input-group">
+      <label>+ UPPER</label>
+      <input type="tel" id="upper" inputmode="numeric" placeholder="0.000" style="color:var(--danger)">
+    </div>
+    <div class="input-group">
+      <label>− LOWER</label>
+      <input type="tel" id="lower" inputmode="numeric" placeholder="0.000" style="color:var(--primary)">
+    </div>
+  </div>
+
+  <button class="reset-btn" onclick="resetAll()">RESET / איפוס</button>
+
+</div>
+
 <script>
-  function format(num) {
-    return parseFloat(num).toFixed(3);
+  // מחזיק את הערכים הגולמיים (למשל '123' עבור 0.123)
+  const state = {
+    nom: '',
+    upper: '',
+    lower: ''
+  };
+
+  const inputs = ['nom', 'upper', 'lower'];
+
+  inputs.forEach(id => {
+    const el = document.getElementById(id);
+    
+    // מאזין להקלדה
+    el.addEventListener('keydown', (e) => {
+      e.preventDefault(); // מבטל התנהגות רגילה של הדפדפן
+
+      let currentRaw = state[id];
+
+      // זיהוי מספרים (0-9)
+      if (e.key >= '0' && e.key <= '9') {
+        // מגבלה סבירה שלא יקלידו אינסוף
+        if (currentRaw.length < 9) {
+          currentRaw += e.key;
+        }
+      } 
+      // זיהוי מחיקה (Backspace)
+      else if (e.key === 'Backspace') {
+        currentRaw = currentRaw.slice(0, -1);
+      }
+      
+      // שמירת מצב חדש
+      state[id] = currentRaw;
+      
+      // עדכון תצוגה
+      updateDisplay(el, currentRaw);
+      calculate();
+    });
+
+    // טיפול בלחיצה כדי שלא יקפוץ סמן
+    el.addEventListener('click', () => {
+      // ממקם את הסמן בסוף תמיד (למרות שהוא מוסתר)
+      el.setSelectionRange(el.value.length, el.value.length);
+    });
+  });
+
+  function updateDisplay(el, rawVal) {
+    if (!rawVal) {
+      el.value = ""; // מראה Placeholder
+      return;
+    }
+    const num = parseInt(rawVal, 10);
+    // חלוקה ב-1000 כדי לקבל 3 ספרות אחרי הנקודה
+    const formatted = (num / 1000).toFixed(3);
+    el.value = formatted;
   }
 
   function calculate() {
-    const nominalVal = document.getElementById('nominal').value;
-    const upperVal = document.getElementById('upperTol').value;
-    const lowerVal = document.getElementById('lowerTol').value;
-    
-    if (nominalVal === "") {
-      alert("נא להזין מידה נומינלית");
+    // המרה למספרים ממשיים לצורך חישוב
+    const n = state.nom ? parseInt(state.nom, 10) / 1000 : 0;
+    const u = state.upper ? parseInt(state.upper, 10) / 1000 : 0;
+    const l = state.lower ? parseInt(state.lower, 10) / 1000 : 0;
+
+    // אם אין נומינלי, אל תציג שטויות, או תציג אפסים
+    if (n === 0 && u === 0 && l === 0) {
+      document.getElementById('resMax').textContent = "0.000";
+      document.getElementById('resMin').textContent = "0.000";
+      document.getElementById('resRng').textContent = "0.000";
       return;
     }
 
-    const nom = parseFloat(nominalVal);
-    const up = upperVal === "" ? 0 : parseFloat(upperVal);
-    const low = lowerVal === "" ? 0 : parseFloat(lowerVal);
+    const max = n + u;
+    const min = n - l;
+    const rng = max - min;
 
-    const max = nom + up;
-    const min = nom - low; // חיסור הערך (הנחת עבודה שהמשתמש מזין ערך אבסולוטי למינוס או שהנוסחה מותאמת)
-    const range = (max - min); 
-    
-    // אם המשתמש מזין מינוס בתוך שדה המינוס, צריך לטפל בזה. 
-    // בדרך כלל בשרטוט: 10 +0.1 / -0.1 -> המינימום הוא 9.9.
-    // הקוד הזה מניח שהמשתמש מכניס את המספר 0.1 בשדה ה-Lower.
-
-    let html = '';
-    html += `<div class="result-row"><span class="label-text c-max">MAX</span> <span class="val-text">${format(max)}</span></div>`;
-    html += `<div class="result-row"><span class="label-text c-min">MIN</span> <span class="val-text">${format(min)}</span></div>`;
-    html += `<div class="result-row" style="background: rgba(0, 230, 118, 0.05);"><span class="label-text c-rng">TOTAL</span> <span class="val-text">${format(range)}</span></div>`;
-
-    const card = document.getElementById('resultCard');
-    card.innerHTML = html;
-    card.classList.add('show');
-    
-    // סגירת מקלדת בנייד
-    document.activeElement.blur();
+    document.getElementById('resMax').textContent = max.toFixed(3);
+    document.getElementById('resMin').textContent = min.toFixed(3);
+    document.getElementById('resRng').textContent = rng.toFixed(3);
   }
 
-  function resetCalc() {
-    document.getElementById('nominal').value = '';
-    document.getElementById('upperTol').value = '';
-    document.getElementById('lowerTol').value = '';
-    const card = document.getElementById('resultCard');
-    card.classList.remove('show');
-    setTimeout(() => card.innerHTML = '', 300);
+  function resetAll() {
+    state.nom = '';
+    state.upper = '';
+    state.lower = '';
+    inputs.forEach(id => {
+      document.getElementById(id).value = '';
+    });
+    calculate();
   }
 </script>
 
