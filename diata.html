@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Heli 1200 PRO - V5 Fixed</title>
+    <title>Heli 1200 PRO V6</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
     
     <style>
         :root { 
@@ -15,89 +15,94 @@
             --border: #334155; --radius: 16px;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { font-family: 'Rubik', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 12px; padding-bottom: 100px; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; touch-action: manipulation; }
+        body { font-family: 'Rubik', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 12px; padding-bottom: 100px; overflow-x: hidden; }
         
+        /* Date Trigger Wrapper - The Fix */
+        .date-trigger-wrapper { position: relative; display: flex; align-items: center; gap: 10px; background: var(--card); padding: 8px 12px; border-radius: 12px; border: 1px solid var(--border); }
+        .native-date-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 10; cursor: pointer; }
+
         /* Header */
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .date-picker-trigger { background: var(--card); border: 1px solid var(--border); padding: 8px 15px; border-radius: 12px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
-        
+        .streak-badge { background: rgba(245, 158, 11, 0.2); color: var(--warning); padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; }
+
         /* Stats Grid */
         .header-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: var(--card); padding: 12px; border-radius: var(--radius); text-align: center; border: 1px solid var(--border); position: relative; overflow: hidden; }
-        .stat-val { font-size: 1.3rem; font-weight: 700; color: var(--accent); position: relative; z-index: 2; }
-        .stat-label { font-size: 0.7rem; color: var(--text-muted); position: relative; z-index: 2; }
-        .danger-glow { box-shadow: inset 0 0 20px rgba(239, 68, 68, 0.2); border-color: var(--danger); }
+        .stat-card { background: var(--card); padding: 15px 5px; border-radius: var(--radius); text-align: center; border: 1px solid var(--border); }
+        .stat-val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+        .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
+        .danger-text { color: var(--danger) !important; }
 
-        /* Report Cards */
+        /* Report Grid */
         .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .report-box { background: #263346; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
-        .report-value { font-size: 1.4rem; font-weight: bold; color: white; }
+        .report-value { font-size: 1.5rem; font-weight: bold; color: white; }
+        .report-sub { font-size: 0.8rem; color: #aaa; margin-top: 2px; }
 
-        /* Cheat Meal Section (New Design) */
-        .cheat-meal-container { background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.3); padding: 15px; border-radius: 12px; margin-bottom: 20px; transition: all 0.3s; }
+        /* Cheat Meal */
+        .cheat-meal-container { background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); padding: 16px; border-radius: 12px; margin-bottom: 20px; }
         .cheat-header { display: flex; justify-content: space-between; align-items: center; }
-        .cheat-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
-        .cheat-switch input { opacity: 0; width: 0; height: 0; }
+        .switch { position: relative; display: inline-block; width: 52px; height: 28px; z-index: 5; }
+        .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #475569; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--warning); }
         input:checked + .slider:before { transform: translateX(24px); }
-        
-        #cheat-details { margin-top: 15px; border-top: 1px solid rgba(245, 158, 11, 0.2); padding-top: 10px; display: none; animation: fadeIn 0.3s; }
-        .cheat-input-row { display: flex; gap: 10px; margin-top: 5px; }
+        #cheat-details { margin-top: 15px; border-top: 1px solid rgba(245, 158, 11, 0.2); padding-top: 15px; display: none; }
 
-        /* Meal & Water */
-        .water-card { background: linear-gradient(135deg, #172554 0%, #1e40af 100%); padding: 16px; border-radius: var(--radius); margin-bottom: 20px; color: white; box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3); }
-        .progress-bg { background: rgba(255,255,255,0.15); height: 12px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
-        .progress-fill { height: 100%; background: #60a5fa; width: 0%; transition: width 0.5s; }
+        /* Water & Meals */
+        .water-card { background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%); padding: 18px; border-radius: var(--radius); margin-bottom: 20px; color: white; box-shadow: 0 4px 20px rgba(30, 64, 175, 0.4); }
+        .progress-bg { background: rgba(255,255,255,0.2); height: 14px; border-radius: 10px; overflow: hidden; margin: 12px 0; }
+        .progress-fill { height: 100%; background: #60a5fa; width: 0%; transition: width 0.3s; }
+        .water-btns { display: flex; gap: 12px; }
+        .water-btn { flex: 1; background: rgba(255,255,255,0.25); border: none; color: white; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; }
+        .water-btn:active { background: rgba(255,255,255,0.4); }
         
         .meal-card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); }
-        .meal-card.completed { border-color: var(--success); }
-        .meal-header { display: flex; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
-
-        /* Inputs */
-        select, input { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 16px; margin-bottom: 10px; appearance: none; }
+        .meal-card.completed { border-color: var(--success); background: rgba(16, 185, 129, 0.05); }
         
-        /* Nav */
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); padding: 10px 10px 25px 10px; display: flex; justify-content: space-around; border-top: 1px solid var(--border); z-index: 1000; }
-        .nav-btn { background: none; border: none; color: var(--text-muted); font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; gap: 4px; width: 60px; }
-        .nav-btn.active { color: var(--accent); }
-        .nav-icon { font-size: 1.4rem; margin-bottom: 2px; }
+        select, input[type="text"], input[type="number"] { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 16px; margin-bottom: 12px; appearance: none; }
+        
+        /* Navigation - Fixed Touch Targets */
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); padding: 8px 0 25px 0; display: flex; justify-content: space-evenly; border-top: 1px solid var(--border); z-index: 2000; }
+        .nav-item { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 60px; height: 50px; color: var(--text-muted); background: none; border: none; font-size: 0.7rem; }
+        .nav-item.active { color: var(--accent); }
+        .nav-icon { font-size: 1.5rem; margin-bottom: 4px; }
+        /* Special wrapper for Calendar Nav Item to ensure clickability */
+        .nav-item-calendar { position: relative; overflow: hidden; }
 
         /* Modals */
-        #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; align-items: flex-end; }
-        .modal-content { background: var(--card); width: 100%; max-height: 90vh; border-radius: 24px 24px 0 0; padding: 25px; overflow-y: auto; }
-        #hidden-date { position: absolute; opacity: 0; top: -1000px; }
-        .btn-primary { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; margin-top: 10px; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:3000; align-items: flex-end; }
+        .modal-content { background: var(--card); width: 100%; height: 90vh; border-radius: 24px 24px 0 0; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; }
+        .modal-body { flex: 1; overflow-y: auto; }
+        .btn-close { width:100%; padding:18px; margin-top:15px; background: #334155; border:none; color:white; border-radius: 14px; font-weight:bold; font-size:1.1rem; flex-shrink: 0; }
+        .btn-primary { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: bold; margin-top: 10px; font-size: 1rem; }
     </style>
 </head>
 <body>
 
 <div class="header-top">
-    <div onclick="triggerDatePicker()" class="date-picker-trigger">
-        <span style="font-size:1.2rem;">📅</span>
+    <div class="date-trigger-wrapper">
+        <input type="date" id="header-date-input" class="native-date-input" onchange="onDatePicked(this.value)">
+        <span style="font-size:1.5rem;">📅</span>
         <div>
-            <div style="font-size:0.7rem; color:var(--text-muted);">לחץ לשינוי תאריך</div>
-            <div id="cur-date-display" style="font-weight:bold;">היום</div>
+            <div style="font-size:0.7rem; color:var(--text-muted);">תאריך מוצג</div>
+            <div id="cur-date-display" style="font-weight:bold; font-size:1.1rem;">היום</div>
         </div>
     </div>
-    <div id="streak-badge" style="background:rgba(245, 158, 11, 0.2); color:var(--warning); padding:6px 12px; border-radius:20px; font-size:0.8rem; font-weight:bold;">
+    <div class="streak-badge">
         🔥 <span id="streak-count">0</span>
     </div>
 </div>
-<input type="date" id="hidden-date" onchange="onDatePicked(this.value)">
 
 <div class="header-grid">
     <div class="stat-card" id="cal-card">
         <div id="cal-val" class="stat-val">0</div>
-        <div class="stat-label">סה״כ קלוריות</div>
+        <div class="stat-label">קלוריות</div>
     </div>
     <div class="stat-card" onclick="openReportMode()">
         <div id="weight-val" class="stat-val" style="color:var(--success);">--</div>
-        <div class="stat-label">משקל אחרון</div>
+        <div class="stat-label">משקל</div>
     </div>
     <div class="stat-card">
         <div id="left-val" class="stat-val">1200</div>
@@ -107,81 +112,88 @@
 
 <div id="app-view">
     <div class="water-card">
-        <div style="display:flex; justify-content:space-between;">
-            <strong>💧 מים</strong>
-            <span id="water-count">0 / 12</span>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-weight:bold; font-size:1.2rem;">💧 מים</div>
+            <div id="water-count" style="font-size:1.2rem;">0 / 12</div>
         </div>
         <div class="progress-bg"><div id="water-bar" class="progress-fill"></div></div>
-        <div style="display:flex; gap:10px;">
-            <button onclick="addWater(-1)" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:8px; border-radius:8px; flex:1;">-</button>
-            <button onclick="addWater(1)" style="background:rgba(255,255,255,0.2); border:none; color:white; padding:8px; border-radius:8px; flex:1;">+ כוס</button>
+        <div class="water-btns">
+            <button class="water-btn" onclick="addWater(-1)">-</button>
+            <button class="water-btn" onclick="addWater(1)">+ כוס</button>
         </div>
     </div>
 
     <div class="cheat-meal-container">
         <div class="cheat-header">
             <div>
-                <div style="font-weight:bold; color:var(--warning); font-size:1rem;">🍔 מנה מותרת</div>
-                <div style="font-size:0.75rem; color:var(--text-muted);">פעם בשבוע (600 קל')</div>
+                <div style="font-weight:bold; color:var(--warning); font-size:1.1rem;">🍔 מנה מותרת</div>
+                <div style="font-size:0.8rem; color:var(--text-muted);">פעם בשבוע (600+)</div>
             </div>
-            <label class="cheat-switch">
+            <label class="switch">
                 <input type="checkbox" id="cheat-toggle" onchange="toggleCheat()">
                 <span class="slider"></span>
             </label>
         </div>
         
         <div id="cheat-details">
+            <div id="cheat-warning" style="color:var(--danger); font-weight:bold; margin-bottom:10px; display:none;">⚠️ שים לב: כבר סומנה מנה מותרת השבוע!</div>
             <label>מה אכלת?</label>
-            <input type="text" id="cheat-desc" placeholder="לדוגמה: המבורגר וצ'יפס..." onchange="saveCheat()" style="border-color:var(--warning);">
-            <div class="cheat-input-row">
-                <div style="flex:1">
-                    <label>קלוריות (מוערך)</label>
-                    <input type="number" id="cheat-cal" value="600" onchange="saveCheat()" style="margin:0;">
-                </div>
-            </div>
-            <div id="cheat-warning" style="font-size:0.75rem; color:var(--danger); margin-top:8px; display:none;">⚠️ שים לב: כבר סומנה מנה מותרת השבוע!</div>
+            <input type="text" id="cheat-desc" placeholder="פירוט המנה..." onchange="saveCheat()">
+            <label>קלוריות (600 ברירת מחדל)</label>
+            <input type="number" id="cheat-cal" value="600" onchange="saveCheat()">
         </div>
     </div>
 
     <div id="meals-container"></div>
 </div>
 
+<div style="height:60px;"></div>
+
 <div class="nav-bar">
-    <button class="nav-btn" onclick="changeDate(-1)">
-        <span class="nav-icon">◀</span><span>אתמול</span>
+    <button class="nav-item" onclick="changeDate(-1)">
+        <span class="nav-icon">◀</span>
+        <span>אתמול</span>
     </button>
-    <button class="nav-btn active" onclick="triggerDatePicker()">
-        <span class="nav-icon">📅</span><span>יומן</span>
+    
+    <div class="nav-item nav-item-calendar active">
+        <input type="date" id="nav-date-input" class="native-date-input" onchange="onDatePicked(this.value)">
+        <span class="nav-icon">📅</span>
+        <span>יומן</span>
+    </div>
+
+    <button class="nav-item" onclick="openReportMode()">
+        <span class="nav-icon">📊</span>
+        <span>דוחות</span>
     </button>
-    <button class="nav-btn" onclick="openReportMode()">
-        <span class="nav-icon">📊</span><span>דוחות</span>
+    <button class="nav-item" onclick="openTools()">
+        <span class="nav-icon">⚙️</span>
+        <span>כלים</span>
     </button>
-    <button class="nav-btn" onclick="openTools()">
-        <span class="nav-icon">⚙️</span><span>כלים</span>
-    </button>
-    <button class="nav-btn" onclick="changeDate(1)">
-        <span class="nav-icon">▶</span><span>מחר</span>
+    <button class="nav-item" onclick="changeDate(1)">
+        <span class="nav-icon">▶</span>
+        <span>מחר</span>
     </button>
 </div>
 
-<div id="modal" onclick="if(event.target===this)closeModal()">
+<div id="modal">
     <div class="modal-content">
-        <h2 id="modal-title" style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:15px;"></h2>
-        <div id="modal-body"></div>
-        <button onclick="closeModal()" style="width:100%; padding:15px; margin-top:20px; background:transparent; border:1px solid var(--border); color:var(--text-muted); border-radius:12px;">סגור</button>
+        <h2 id="modal-title" style="margin-top:0; border-bottom:1px solid var(--border); padding-bottom:15px; color:var(--accent);"></h2>
+        <div id="modal-body" class="modal-body"></div>
+        <button onclick="closeModal()" class="btn-close">סגור חלונית</button>
     </div>
 </div>
 
 <script>
-// Database & Config
+// --- DATA ---
 const DB = {
-    carbs: ["1 פיתה קלה", "2 פרוסות לחם קל", "1 פרוסת לחם רגיל", "3 כפות אורז/פסטה (אחרי בישול)", "1 תפוח אדמה", "1/2 בטטה", "2 פירכיות", "1/2 כוס קטניות", "1 חטיף אנרגיה (עד 100 קל')", "3 כפות שיבולת שועל"],
+    carbs: ["1 פיתה קלה", "2 פרוסות לחם קל", "1 פרוסת לחם רגיל", "3 כפות אורז/פסטה", "1 תפוח אדמה", "1/2 בטטה", "2 פירכיות", "1/2 כוס קטניות", "1 חטיף אנרגיה", "3 כפות ש.שועל"],
     cheese: ["2 כפות גבינה 5%", "1 פרוסת צהובה 9%", "60 גרם בולגרית 5%", "1 ביצה", "1/2 קופסת טונה במים", "1 מעדן 0%", "1 אצבע מוצרלה", "60 גרם טופו"],
-    meat: ["150 גרם חזה עוף (חי)", "100 גרם בקר רזה (מבושל)", "200 גרם דג (חי)", "1.5 קופסאות טונה במים", "3 קציצות", "מנה צמחונית טבעול"],
-    fat: ["1 כפית שמן", "1 כף טחינה מוכנה", "1 כף אבוקדו", "6 זיתים", "7 שקדים", "3 אגוזי מלך", "1 כפית מיונז", "1 כף כמויונז"],
-    fruit: ["תפוח", "בננה קטנה", "אגס", "2 שזיפים", "1 כוס ענבים", "1 תמר מג'הול", "1 אפרסק", "1 כוס אבטיח"],
+    meat: ["150 גרם חזה עוף (חי)", "100 גרם בקר רזה (מבושל)", "200 גרם דג (חי)", "1.5 קופסאות טונה במים", "3 קציצות", "מנה טבעול"],
+    fat: ["1 כפית שמן", "1 כף טחינה", "1 כף אבוקדו", "7 שקדים", "3 אגוזי מלך", "1 כפית מיונז"],
+    fruit: ["תפוח", "בננה קטנה", "אגס", "2 שזיפים", "1 כוס ענבים", "1 תמר מג'הול", "1 אפרסק"],
     half_cheese: ["פרוסת צהובה 5%", "כף גבינה 5%", "30 גרם בולגרית", "חצי ביצה", "2 פרוסות פסטרמה"]
 };
+
 const mealsConfig = [
     { n: "בוקר", t: 9, c: 200, p: [{l: "פחמימה", d: DB.carbs}, {l: "חלבון גבינה", d: DB.cheese}] },
     { n: "ביניים", t: 11, c: 150, p: [{l: "פרי", d: DB.fruit}, {l: "שומן", d: DB.fat}] },
@@ -192,21 +204,24 @@ const mealsConfig = [
 ];
 
 let vDate = new Date();
-let appData = JSON.parse(localStorage.getItem('heli_pro_v5')) || { days: {}, weights: [] };
+let appData = JSON.parse(localStorage.getItem('heli_pro_v6')) || { days: {}, weights: [] };
 
 const getK = d => d.toLocaleDateString('he-IL').replace(/\./g, '-');
 const getISO = d => { const offset = d.getTimezoneOffset() * 60000; return new Date(d.getTime() - offset).toISOString().split('T')[0]; }
-const save = () => localStorage.setItem('heli_pro_v5', JSON.stringify(appData));
+const save = () => localStorage.setItem('heli_pro_v6', JSON.stringify(appData));
 
 function init() {
     const k = getK(vDate);
     const day = appData.days[k] || {};
     const todayK = getK(new Date());
 
+    // Update Headers & Inputs
     document.getElementById('cur-date-display').innerText = (k === todayK) ? "היום" : k;
-    document.getElementById('hidden-date').value = getISO(vDate);
+    const iso = getISO(vDate);
+    document.getElementById('header-date-input').value = iso;
+    document.getElementById('nav-date-input').value = iso;
 
-    // Meals
+    // Build Meals
     let html = '';
     mealsConfig.forEach((m, i) => {
         let isComplete = true;
@@ -215,12 +230,12 @@ function init() {
         <div class="meal-card ${isComplete ? 'completed' : ''}">
             <div class="meal-header">
                 <div><strong>${m.n}</strong> <span style="font-size:0.8rem; opacity:0.7">${m.t}:00</span></div>
-                <div style="font-size:0.8rem">${m.c} קל'</div>
+                <div>${m.c} קל'</div>
             </div>
             ${m.p.map((part, pi) => `
-                <div style="margin-bottom:8px">
+                <div style="margin-bottom:10px;">
                     <label>${part.l}</label>
-                    <select onchange="upd('${k}', '${i}_${pi}', this.value)" style="margin:0">
+                    <select onchange="upd('${k}', '${i}_${pi}', this.value)" style="margin:0;">
                         <option value="">בחר...</option>
                         ${part.d.map(x => `<option value="${x}" ${day[`${i}_${pi}`]===x?'selected':''}>${x}</option>`).join('')}
                     </select>
@@ -236,16 +251,15 @@ function init() {
     document.getElementById('water-bar').style.width = `${Math.min((w/12)*100, 100)}%`;
     if(w>=12) document.getElementById('water-bar').style.background = '#10b981';
 
-    // Cheat Meal Logic
+    // Cheat Meal
     const isCheat = day.isCheatMeal || false;
     document.getElementById('cheat-toggle').checked = isCheat;
     const details = document.getElementById('cheat-details');
-    
     if(isCheat) {
         details.style.display = 'block';
         document.getElementById('cheat-desc').value = day.cheatDesc || '';
         document.getElementById('cheat-cal').value = day.cheatCal || 600;
-        checkCheatHistory(k);
+        checkCheatHistory();
     } else {
         details.style.display = 'none';
     }
@@ -271,21 +285,13 @@ function addWater(n) {
     init();
 }
 
-// Cheat Meal Functions
+// Cheat Meal
 function toggleCheat() {
     const k = getK(vDate);
     if(!appData.days[k]) appData.days[k]={};
-    
     const isOn = document.getElementById('cheat-toggle').checked;
     appData.days[k].isCheatMeal = isOn;
-    
-    if(isOn) {
-        // Default values
-        if(!appData.days[k].cheatCal) appData.days[k].cheatCal = 600;
-    } else {
-        // Reset if turned off? Optional. Let's keep data but not count it.
-        // Or clear it? Let's just hide it.
-    }
+    if(isOn && !appData.days[k].cheatCal) appData.days[k].cheatCal = 600;
     save();
     init();
 }
@@ -299,7 +305,7 @@ function saveCheat() {
     updateStats(appData.days[k]);
 }
 
-function checkCheatHistory(currentK) {
+function checkCheatHistory() {
     let found = false;
     let d = new Date(vDate);
     for(let i=1; i<=6; i++) {
@@ -308,9 +314,10 @@ function checkCheatHistory(currentK) {
         if (appData.days[k] && appData.days[k].isCheatMeal) found = true;
     }
     const warn = document.getElementById('cheat-warning');
-    if (found) { warn.style.display = 'block'; } else { warn.style.display = 'none'; }
+    warn.style.display = found ? 'block' : 'none';
 }
 
+// Stats
 function updateStats(day) {
     let t = 0;
     mealsConfig.forEach((m, i) => {
@@ -318,35 +325,32 @@ function updateStats(day) {
         m.p.forEach((_, pi) => { if(day[`${i}_${pi}`]) act=true; });
         if(act) t += m.c;
     });
-
-    // Add Cheat Meal Calories
-    if(day.isCheatMeal) {
-        t += (day.cheatCal || 0);
-    }
+    if(day.isCheatMeal) t += (day.cheatCal || 0);
 
     document.getElementById('cal-val').innerText = t;
     const left = 1200 - t;
     const leftEl = document.getElementById('left-val');
     const calCard = document.getElementById('cal-card');
-
     leftEl.innerText = left;
     
-    // Visual Feedback for Overdraft
     if(left < 0) {
-        leftEl.style.color = '#ef4444'; // Red
-        calCard.classList.add('danger-glow');
+        leftEl.classList.add('danger-text');
+        calCard.style.borderColor = 'var(--danger)';
     } else {
-        leftEl.style.color = 'white';
-        calCard.classList.remove('danger-glow');
+        leftEl.classList.remove('danger-text');
+        calCard.style.borderColor = 'var(--border)';
     }
 
     const lw = appData.weights.length ? appData.weights[appData.weights.length-1].w : '--';
     document.getElementById('weight-val').innerText = lw;
 }
 
-// Nav & Utils
-function triggerDatePicker() { document.getElementById('hidden-date').showPicker(); }
-function onDatePicked(v) { if(v){ vDate = new Date(v); init(); } }
+// Global Nav & Utils
+function onDatePicked(val) {
+    if(!val) return;
+    vDate = new Date(val);
+    init();
+}
 function changeDate(n) { vDate.setDate(vDate.getDate()+n); init(); }
 
 function calculateStreak() {
@@ -359,111 +363,107 @@ function calculateStreak() {
     document.getElementById('streak-count').innerText = s;
 }
 
+// Modals
 function openReportMode() {
-    const weights = appData.weights;
-    const currentW = weights.length ? weights[weights.length-1].w : 0;
-    const startW = weights.length ? weights[0].w : 0;
-    const totalLost = (startW && currentW) ? (startW - currentW).toFixed(1) : 0;
+    const wArr = appData.weights;
+    const curW = wArr.length ? wArr[wArr.length-1].w : 0;
+    const startW = wArr.length ? wArr[0].w : 0;
+    const diff = (startW && curW) ? (startW - curW).toFixed(1) : 0;
     
-    // Weekly Calc
-    let weekCalSum = 0, daysCount = 0;
-    let d = new Date();
+    // Weekly Avg
+    let calSum=0, count=0, d=new Date();
     for(let i=0; i<7; i++) {
         const k = getK(d);
         if(appData.days[k]) {
-            let dailyC = 0;
+            let dayC = 0;
             mealsConfig.forEach((m,idx) => {
                 let act = false;
                 m.p.forEach((_,pi) => { if(appData.days[k][`${idx}_${pi}`]) act=true; });
-                if(act) dailyC += m.c;
+                if(act) dayC += m.c;
             });
-            if(appData.days[k].isCheatMeal) dailyC += (appData.days[k].cheatCal || 0);
-            
-            if(dailyC > 0) { weekCalSum += dailyC; daysCount++; }
+            if(appData.days[k].isCheatMeal) dayC += (appData.days[k].cheatCal || 0);
+            if(dayC > 0) { calSum+=dayC; count++; }
         }
         d.setDate(d.getDate()-1);
     }
-    const avgCal = daysCount ? Math.round(weekCalSum / daysCount) : 0;
+    const avg = count ? Math.round(calSum/count) : 0;
 
     document.getElementById('modal-title').innerText = "דוח סיכום";
     document.getElementById('modal-body').innerHTML = `
         <div class="report-grid">
             <div class="report-box">
-                <div style="font-size:0.8rem; color:#aaa">ירידה</div>
-                <div class="report-value" style="color:${totalLost>0?'#10b981':'white'}">${totalLost}</div>
+                <div class="report-sub">ירדת סה"כ</div>
+                <div class="report-value" style="color:${diff>0?'#10b981':'white'}">${diff} ק"ג</div>
             </div>
             <div class="report-box">
-                <div style="font-size:0.8rem; color:#aaa">נוכחי</div>
-                <div class="report-value">${currentW || '--'}</div>
+                <div class="report-sub">משקל נוכחי</div>
+                <div class="report-value">${curW || '--'}</div>
             </div>
             <div class="report-box">
-                <div style="font-size:0.8rem; color:#aaa">ממוצע קלוריות</div>
-                <div class="report-value">${avgCal}</div>
+                <div class="report-sub">ממוצע קלוריות (7 ימים)</div>
+                <div class="report-value" style="color:${avg>1250?'#ef4444':'white'}">${avg}</div>
             </div>
         </div>
-        <h4 style="margin-bottom:10px;">גרף משקל</h4>
-        <div style="background:#1e293b; padding:10px; border-radius:12px; height:200px;">
-            <canvas id="reportChart"></canvas>
+        <h3 style="margin:15px 0 10px 0;">גרף משקל</h3>
+        <div style="height:200px; background:#18212f; border-radius:12px; padding:10px;">
+            <canvas id="repChart"></canvas>
         </div>
         <div style="margin-top:20px; display:flex; gap:10px;">
-            <input type="number" id="new-w-input" placeholder="עדכן משקל..." step="0.1">
-            <button onclick="addWeight()" class="btn-primary" style="margin:0; width:auto; padding:0 20px;">שמור</button>
+            <input type="number" id="w-input" placeholder="עדכן משקל..." step="0.1">
+            <button class="btn-primary" style="margin:0; width:auto;" onclick="addW()">שמור</button>
         </div>
     `;
     document.getElementById('modal').style.display = 'flex';
-
+    
     setTimeout(() => {
-        const ctx = document.getElementById('reportChart').getContext('2d');
-        const labels = weights.slice(-10).map(x=>x.d);
-        const data = weights.slice(-10).map(x=>x.w);
+        if(wArr.length < 2) return;
+        const ctx = document.getElementById('repChart').getContext('2d');
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
-                datasets: [{ label: 'משקל', data: data, borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.1)', fill: true, tension: 0.3 }]
+                labels: wArr.slice(-10).map(x=>x.d),
+                datasets: [{ label:'משקל', data:wArr.slice(-10).map(x=>x.w), borderColor:'#3b82f6', tension:0.3, fill:true, backgroundColor:'rgba(59,130,246,0.1)' }]
             },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { grid: { color: '#334155' } }, x: { display: false } }, plugins: { legend: { display: false } } }
+            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{grid:{color:'#334155'}}} }
         });
-    }, 100);
+    }, 150);
 }
 
-function addWeight() {
-    const v = parseFloat(document.getElementById('new-w-input').value);
-    if(v) {
-        appData.weights.push({d: getK(new Date()), w: v});
-        save();
-        openReportMode();
-        init();
-    }
+function addW() {
+    const v = parseFloat(document.getElementById('w-input').value);
+    if(v) { appData.weights.push({d:getK(new Date()), w:v}); save(); openReportMode(); init(); }
 }
 
 function openTools() {
     document.getElementById('modal-title').innerText = "כלים";
     document.getElementById('modal-body').innerHTML = `
-        <button class="btn-primary" onclick="generateShoppingList()" style="background:#475569; margin-bottom:10px;">🛒 צור רשימת קניות</button>
-        <button class="btn-primary" onclick="exportData()" style="background:#475569; margin-bottom:10px;">💾 גיבוי נתונים</button>
-        <button class="btn-primary" onclick="importData()" style="background:#475569;">📂 שחזור נתונים</button>
+        <button class="btn-primary" onclick="genShop()" style="background:#475569; margin-bottom:12px;">🛒 רשימת קניות</button>
+        <button class="btn-primary" onclick="expData()" style="background:#475569; margin-bottom:12px;">💾 גיבוי נתונים</button>
+        <button class="btn-primary" onclick="impData()" style="background:#475569;">📂 שחזור נתונים</button>
     `;
     document.getElementById('modal').style.display = 'flex';
 }
+
 function closeModal() { document.getElementById('modal').style.display = 'none'; }
-function generateShoppingList() {
-    const k = getK(vDate); const day = appData.days[k];
-    if(!day) return alert('אין פריטים ביום זה');
-    let txt = `*רשימת קניות (${k}):*\n`;
-    Object.values(day).forEach(v => { if(typeof v === 'string') txt += `- [ ] ${v}\n`; });
-    if(day.isCheatMeal) txt += `- [ ] מצרכים למנה מותרת: ${day.cheatDesc}\n`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`);
+
+function genShop() {
+    const k=getK(vDate), day=appData.days[k];
+    if(!day) return alert('ריק');
+    let t = `*רשימת קניות ${k}*\n`;
+    Object.values(day).forEach(v => { if(typeof v==='string') t+=`- [ ] ${v}\n` });
+    window.open(`https://wa.me/?text=${encodeURIComponent(t)}`);
 }
-function exportData() {
+
+function expData() {
     const s = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
     const a = document.createElement('a'); a.href = s; a.download = "backup.json"; a.click();
 }
-function importData() {
+
+function impData() {
     const i = document.createElement('input'); i.type = 'file';
     i.onchange = e => {
         const r = new FileReader();
-        r.onload = ev => { appData = JSON.parse(ev.target.result); save(); init(); closeModal(); alert('שוחזר!'); };
+        r.onload = ev => { appData = JSON.parse(ev.target.result); save(); init(); closeModal(); alert('בוצע'); };
         r.readAsText(e.target.files[0]);
     };
     i.click();
