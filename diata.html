@@ -2,217 +2,144 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מתכנן תזונה PRO | 1200 קלוריות</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Heli 1200 Pro - Yosef</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700&display=swap');
-        body { font-family: 'Heebo', sans-serif; background-color: #f3f4f6; }
-        .meal-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid transparent; }
-        .meal-card:hover { transform: translateY(-2px); shadow-lg; }
-        .meal-card.active { border-color: #10b981; background-color: #ecfdf5; }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        /* סרגל גלילה מותאם */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        :root { --p: #2563eb; --bg: #f8fafc; --txt: #1e293b; --success: #10b981; }
+        body { font-family: -apple-system, system-ui; background: var(--bg); color: var(--txt); margin: 0; padding: 12px; padding-bottom: 40px; }
+        .motivation-bar { background: linear-gradient(135deg, var(--p), #1e40af); color: white; padding: 12px; border-radius: 12px; text-align: center; font-weight: bold; margin-bottom: 12px; font-size: 0.9rem; }
+        .card { background: white; border-radius: 16px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; position: sticky; top: 10px; z-index: 10; }
+        .stat-box { background: white; padding: 10px; border-radius: 14px; text-align: center; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .btn-nav { display: flex; gap: 5px; margin-bottom: 10px; }
+        button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; background: var(--p); color: white; }
+        select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; font-size: 1rem; margin-top: 8px; background: #fff; color: var(--txt); }
+        .weight-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
     </style>
 </head>
-<body class="text-gray-800 pb-24">
+<body>
 
-    <header class="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-6 shadow-lg rounded-b-3xl mb-6">
-        <div class="max-w-3xl mx-auto flex justify-between items-center">
-            <div>
-                <h1 class="text-2xl font-bold tracking-tight">תפריט חזרה לשגרה</h1>
-                <p class="text-emerald-100 text-sm opacity-90">תכנון יומי חכם • 1200 קלוריות</p>
-            </div>
-            <div class="text-center bg-white/20 p-2 rounded-xl backdrop-blur-sm">
-                <i class="fas fa-calendar-check text-2xl mb-1"></i>
-                <div class="text-xs font-medium">יום 1/3</div>
-            </div>
-        </div>
-    </header>
+<div id="quote" class="motivation-bar">טוען חיזוק...</div>
 
-    <main class="max-w-3xl mx-auto px-4 space-y-6" id="app">
-        </main>
-
-    <div class="fixed bottom-0 left-0 right-0 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.1)] border-t z-50 p-4 transition-transform duration-300" id="stickyFooter">
-        <div class="max-w-3xl mx-auto flex justify-between items-center">
-            <div class="flex flex-col">
-                <span class="text-xs text-gray-500 font-medium">סה"כ יומי (משוער)</span>
-                <div class="flex items-baseline gap-1">
-                    <span id="totalCalories" class="text-2xl font-bold text-emerald-600">0</span>
-                    <span class="text-sm text-gray-400">/ 1200 קק"ל</span>
-                </div>
-            </div>
-            <div class="w-1/2 max-w-[150px]">
-                <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div id="progressBar" class="h-full bg-emerald-500 transition-all duration-500" style="width: 0%"></div>
-                </div>
-                <div class="text-[10px] text-gray-400 text-center mt-1">צריכה יומית</div>
-            </div>
-        </div>
+<div class="stats-row">
+    <div class="stat-box">
+        <div id="cur-date" style="font-size: 0.7rem; color: #64748b;">היום</div>
+        <div id="cal-count" style="font-size: 1.4rem; font-weight: bold; color: var(--p);">0</div>
+        <div style="font-size: 0.6rem;">קלוריות</div>
     </div>
+    <div class="stat-box">
+        <div style="font-size: 0.7rem; color: #64748b;">משקל נוכחי</div>
+        <div id="last-weight" style="font-size: 1.4rem; font-weight: bold; color: var(--success);">--</div>
+        <div style="font-size: 0.6rem;">ק״ג</div>
+    </div>
+</div>
 
-    <script>
-        // נתונים (מבוסס על המסמך + הערכה קלורית מקצועית סטנדרטית לרכיבים)
-        const menuData = [
-            {
-                id: 'breakfast',
-                title: 'ארוחת בוקר',
-                icon: 'fa-mug-hot',
-                color: 'text-orange-500',
-                options: [
-                    { name: "2 כפות קוטג' 5% + אגס", cal: 160 },
-                    { name: "יוגורט 1.5% + תפוח", cal: 160 },
-                    { name: "מעדן חלבון + 1/3 רימון", cal: 130 },
-                    { name: "קפה הפוך (חלב 1%) + תמר", cal: 150 }
-                ]
-            },
-            {
-                id: 'snack1',
-                title: 'ביניים בוקר',
-                icon: 'fa-apple-alt',
-                color: 'text-green-500',
-                options: [
-                    { name: "יוגורט 1.5% + 2 כדורי תמרים", cal: 190 },
-                    { name: "מעדן חלבון + תפוח + 3 מקדמיה", cal: 180 },
-                    { name: "סלט ירוק + בולגרית + אגוזים", cal: 220 },
-                    { name: "שייק (כוס חלב, בננה, 7 שקדים)", cal: 240 }
-                ]
-            },
-            {
-                id: 'lunch',
-                title: 'ארוחת צהריים',
-                icon: 'fa-utensils',
-                color: 'text-red-500',
-                options: [
-                    { name: "חזה עוף צלוי + שעועית מוקפצת", cal: 400 },
-                    { name: "סלמון אפוי + אנטיפסטי", cal: 450 },
-                    { name: "5 קציצות בשר + טחינה + כרוב", cal: 420 }
-                ]
-            },
-            {
-                id: 'snack2',
-                title: 'ביניים אחה"צ',
-                icon: 'fa-cookie-bite',
-                color: 'text-yellow-500',
-                options: [
-                    { name: "2 קרקר לחמית + אגס + 5 לוז", cal: 170 },
-                    { name: "40 גרם ערמונים + בננה + פיסטוקים", cal: 190 },
-                    { name: "10 פריכיות ביס + סלט פירות", cal: 180 }
-                ]
-            },
-            {
-                id: 'dinner',
-                title: 'ארוחת ערב',
-                icon: 'fa-moon',
-                color: 'text-indigo-500',
-                options: [
-                    { name: "מג'דרה (מנה מדודה) + סלט", cal: 350 },
-                    { name: "4 פרוסות לחם קל + ביצה + ריקוטה", cal: 300 },
-                    { name: "2 לחמניות קלות + צפתית + גבנצ", cal: 320 },
-                    { name: "סלט טונה + תירס", cal: 280 },
-                    { name: "פשטידת ברוקולי + לחם קל", cal: 260 }
-                ]
-            }
-        ];
+<div class="btn-nav">
+    <button onclick="changeDate(-1)" style="background:#cbd5e1; color:#1e293b">◄</button>
+    <button onclick="openReport()">📄 דוח ארוחות</button>
+    <button onclick="changeDate(1)" style="background:#cbd5e1; color:#1e293b">►</button>
+</div>
 
-        const state = {
-            selections: {},
-            totalCalories: 0
-        };
+<div id="meals-list"></div>
 
-        function renderApp() {
-            const app = document.getElementById('app');
-            app.innerHTML = menuData.map((meal, index) => `
-                <section class="animate-fade-in" style="animation-delay: ${index * 100}ms">
-                    <div class="flex items-center gap-3 mb-3">
-                        <div class="w-8 h-8 rounded-full bg-white shadow-sm flex items-center justify-center ${meal.color}">
-                            <i class="fas ${meal.icon}"></i>
-                        </div>
-                        <h2 class="text-lg font-bold text-gray-700">${meal.title}</h2>
-                    </div>
-                    
-                    <div class="grid gap-3">
-                        ${meal.options.map((opt, optIndex) => `
-                            <div onclick="selectOption('${meal.id}', ${opt.cal}, this)" 
-                                 class="meal-card bg-white p-4 rounded-xl shadow-sm cursor-pointer relative overflow-hidden group">
-                                <div class="flex justify-between items-center z-10 relative">
-                                    <span class="font-medium text-gray-700 group-hover:text-emerald-700 transition-colors">${opt.name}</span>
-                                    <span class="text-xs font-bold bg-gray-100 text-gray-500 py-1 px-2 rounded-md">~${opt.cal} קל'</span>
-                                </div>
-                                <div class="absolute inset-0 bg-emerald-50 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </section>
-            `).join('');
-        }
+<div class="card">
+    <h3 style="margin-top:0">מעקב משקל</h3>
+    <div style="display:flex; gap:8px; margin-bottom:15px;">
+        <input type="number" id="w-in" step="0.1" placeholder="משקל" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd;">
+        <button onclick="addW()" style="background:var(--success)">עדכן</button>
+    </div>
+    <canvas id="wChart" style="max-height:160px;"></canvas>
+    <div id="w-history" style="margin-top:15px; max-height:120px; overflow-y:auto;"></div>
+</div>
 
-        function selectOption(mealId, calories, element) {
-            // הסרת בחירה קודמת באותה קטגוריה
-            const section = element.closest('section');
-            section.querySelectorAll('.meal-card').forEach(card => {
-                card.classList.remove('active', 'ring-2', 'ring-emerald-500', 'bg-emerald-50');
-                // איפוס אייקון וי
-                const existingCheck = card.querySelector('.check-icon');
-                if(existingCheck) existingCheck.remove();
-            });
+<div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center;">
+    <div style="background:white; width:85%; border-radius:20px; padding:20px; max-height:80%; overflow-y:auto;">
+        <h3 id="modal-date"></h3>
+        <div id="modal-body"></div>
+        <button onclick="closeReport()" style="width:100%; background:#ef4444; margin-top:15px;">סגור</button>
+    </div>
+</div>
 
-            // סימון בחירה חדשה
-            element.classList.add('active', 'ring-2', 'ring-emerald-500', 'bg-emerald-50');
-            
-            // הוספת אייקון וי
-            const checkIcon = document.createElement('i');
-            checkIcon.className = 'fas fa-check-circle text-emerald-500 absolute left-2 top-1/2 -translate-y-1/2 opacity-20 text-4xl check-icon';
-            element.appendChild(checkIcon);
+<script>
+const quotes = ["יוסף, כל בחירה נכונה היא ניצחון!", "התפריט הוא המפה שלך להצלחה.", "אתה חזק יותר מכל פיתוי.", "התמדה מביאה תוצאות.", "זכור למה התחלת!", "עוד יום של שליטה ודיוק."];
+const DB = {
+    carbs: ["2 לחם קל", "חצי כוס אורז/פסטה", "תפוח אדמה", "2 פירכיות", "חטיף אנרגיה"],
+    prot: ["2 כפות גבינה 5%", "פרוסה צהובה 9%", "ביצה קשה", "טונה במים", "מעדן 0%"],
+    meat: ["150ג חזה עוף", "רבע עוף בתנור", "3 קציצות בקר", "פילה דג"],
+    fruit: ["תפוח", "בננה קטנה", "כוס אבטיח", "2 שזיפים", "תפוז"],
+    fat: ["כפית שמן", "כף אבוקדו", "כף טחינה", "7 שקדים", "6 זיתים"]
+};
+const config = [
+    {n:"בוקר", c:200, it:[...DB.carbs, ...DB.prot]},
+    {n:"ביניים בוקר", c:150, it:DB.fruit},
+    {n:"צהריים", c:350, it:DB.meat},
+    {n:"ביניים אחה״צ", c:150, it:[...DB.carbs, ...DB.fruit]},
+    {n:"ערב", c:250, it:[...DB.carbs, ...DB.prot, ...DB.fat]},
+    {n:"לילה", c:100, it:[...DB.prot, ...DB.fruit]}
+];
 
-            // עדכון לוגיקה
-            state.selections[mealId] = calories;
-            calculateTotal();
-        }
+let vDate = new Date();
+let data = JSON.parse(localStorage.getItem('heli_yosef_pro')) || { days:{}, weights:[] };
 
-        function calculateTotal() {
-            const total = Object.values(state.selections).reduce((a, b) => a + b, 0);
-            const totalElement = document.getElementById('totalCalories');
-            const progressBar = document.getElementById('progressBar');
-            
-            // אנימציית מספרים
-            animateValue(totalElement, parseInt(totalElement.innerText), total, 500);
-            
-            // עדכון בר
-            const percentage = Math.min((total / 1200) * 100, 100);
-            progressBar.style.width = `${percentage}%`;
-            
-            // שינוי צבע בר בחריגה
-            if (total > 1250) {
-                progressBar.classList.remove('bg-emerald-500');
-                progressBar.classList.add('bg-red-500');
-            } else {
-                progressBar.classList.add('bg-emerald-500');
-                progressBar.classList.remove('bg-red-500');
-            }
-        }
+function getK(d){ return d.toLocaleDateString('he-IL').replace(/\./g,'-'); }
 
-        function animateValue(obj, start, end, duration) {
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerHTML = Math.floor(progress * (end - start) + start);
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
+function init() {
+    document.getElementById('quote').innerText = quotes[Math.floor(Math.random()*quotes.length)];
+    const k = getK(vDate);
+    document.getElementById('cur-date').innerText = k === getK(new Date()) ? "היום" : k;
+    const day = data.days[k] || {};
+    
+    document.getElementById('meals-list').innerHTML = config.map((m,i) => `
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem"><b>${m.n}</b> <span>${m.c} קל'</span></div>
+            <select onchange="updM('${k}',${i},this.value)">
+                <option value="">בחר...</option>
+                ${m.it.map(x => `<option value="${x}" ${day[i]===x?'selected':''}>${x}</option>`).join('')}
+            </select>
+        </div>
+    `).join('');
+    updateStats(day);
+    renderW();
+}
 
-        // אתחול
-        renderApp();
-    </script>
+function updM(k,i,v){ if(!data.days[k])data.days[k]={}; data.days[k][i]=v; save(); updateStats(data.days[k]); }
+function addW(){ 
+    const v = document.getElementById('w-in').value; if(!v)return;
+    data.weights.unshift({d:getK(new Date()), w:parseFloat(v)});
+    save(); document.getElementById('w-in').value=''; init();
+}
+function updateStats(day){
+    let t=0; Object.keys(day).forEach(i=> {if(day[i]) t+=config[i].c;});
+    document.getElementById('cal-count').innerText = t;
+    if(data.weights.length>0) {
+        document.getElementById('last-weight').innerText = data.weights[0].w;
+        draw();
+    }
+}
+function renderW(){
+    document.getElementById('w-history').innerHTML = data.weights.map(e => `
+        <div class="weight-item"><span>${e.d}</span><b>${e.w} ק״ג</b></div>
+    `).join('');
+}
+function changeDate(n){ vDate.setDate(vDate.getDate()+n); init(); }
+function save(){ localStorage.setItem('heli_yosef_pro', JSON.stringify(data)); }
+function openReport(){
+    const k=getK(vDate); document.getElementById('modal-date').innerText = "דוח ל-"+k;
+    const day = data.days[k] || {};
+    document.getElementById('modal-body').innerHTML = config.map((m,i)=> `
+        <div style="padding:8px 0; border-bottom:1px solid #eee"><b>${m.n}:</b> ${day[i]||'---'}</div>
+    `).join('');
+    document.getElementById('modal').style.display='flex';
+}
+function closeReport(){ document.getElementById('modal').style.display='none'; }
+function draw(){
+    const ctx = document.getElementById('wChart').getContext('2d');
+    if(window.ch) window.ch.destroy();
+    const d = [...data.weights].reverse().slice(-7);
+    window.ch = new Chart(ctx, {type:'line', data:{labels:d.map(x=>x.d), datasets:[{label:'משקל', data:d.map(x=>x.w), borderColor:'#2563eb', tension:0.3}]}, options:{plugins:{legend:{display:false}}}});
+}
+init();
+</script>
 </body>
 </html>
