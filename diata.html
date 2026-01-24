@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Heli 1200 PRO V15</title>
+    <title>Heli 1200 PRO V16 - Profile</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
@@ -34,67 +34,25 @@
         .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
         .danger-text { color: var(--danger) !important; }
 
-        /* WATER */
+        /* CARDS */
         .water-card { background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%); padding: 18px; border-radius: var(--radius); margin-bottom: 20px; color: white; box-shadow: 0 4px 20px rgba(30, 64, 175, 0.4); }
         .progress-bg { background: rgba(255,255,255,0.2); height: 14px; border-radius: 10px; overflow: hidden; margin: 12px 0; }
         .progress-fill { height: 100%; background: #60a5fa; width: 0%; transition: width 0.3s; }
         .water-btns { display: flex; gap: 12px; }
         .water-btn { flex: 1; background: rgba(255,255,255,0.25); border: none; color: white; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; }
 
-        /* --- MEAL CARD & INPUTS FIX --- */
-        .meal-card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); }
+        .meal-card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); transition: 0.3s; }
         .meal-card.active-now { border: 2px solid var(--accent); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
         .meal-card.completed { border-color: var(--success); background: rgba(16, 185, 129, 0.05); }
         
-        /* The container for Select + Star */
-        .select-wrapper { 
-            display: flex; 
-            align-items: center; 
-            gap: 8px; 
-            margin-bottom: 12px; 
-            width: 100%; /* Ensure full width */
-        }
-
-        /* The Select Input - FIXED */
-        select { 
-            flex: 1; /* Take all available space */
-            min-width: 0; /* CRITICAL: Prevents overflow on flex items */
-            width: 100%; 
-            padding: 14px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border); 
-            background: #0f172a; 
-            color: white; 
-            font-size: 16px; /* Prevents zoom on iOS */
-            appearance: none; 
-            margin: 0; 
-            text-overflow: ellipsis; /* Handle long text */
-            white-space: nowrap;
-            overflow: hidden;
-        }
-        select:focus { border-color: var(--accent); }
-        
-        /* The Star Button - FIXED */
-        .fav-btn { 
-            flex-shrink: 0; /* Prevent shrinking */
-            width: 48px; /* Fixed square size */
-            height: 48px; 
-            background: #263346; 
-            border: 1px solid var(--border); 
-            border-radius: 12px; 
-            font-size: 1.4rem; 
-            color: #64748b; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            transition: all 0.2s;
-        }
+        .select-wrapper { position: relative; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+        select { flex: 1; min-width: 0; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 16px; appearance: none; margin: 0; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+        .fav-btn { flex-shrink: 0; width: 48px; height: 48px; background: #263346; border: 1px solid var(--border); border-radius: 12px; font-size: 1.4rem; color: #64748b; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .fav-btn.is-fav { color: #fbbf24; border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
 
         input[type="text"], input[type="number"] { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 16px; margin-bottom: 10px; appearance: none; }
 
-        /* CHEAT MEAL */
+        /* CHEAT & WORKOUT */
         .cheat-meal-container { background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); padding: 16px; border-radius: 12px; margin-bottom: 20px; }
         .cheat-header { display: flex; justify-content: space-between; align-items: center; }
         .switch { position: relative; display: inline-block; width: 52px; height: 28px; z-index: 5; }
@@ -105,17 +63,17 @@
         input:checked + .slider:before { transform: translateX(24px); }
         #cheat-details { margin-top: 15px; border-top: 1px solid rgba(245, 158, 11, 0.2); padding-top: 15px; display: none; }
 
-        /* WORKOUTS & NAV */
         .workout-card { background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); padding: 16px; border-radius: 12px; margin-bottom: 20px; }
         .workout-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .workout-list-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
 
+        /* NAV */
         .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); padding: 8px 0 25px 0; display: flex; justify-content: space-evenly; border-top: 1px solid var(--border); z-index: 2000; backdrop-filter: blur(10px); }
         .nav-item { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 60px; height: 50px; color: var(--text-muted); background: none; border: none; font-size: 0.7rem; }
         .nav-item.active { color: var(--accent); }
         .nav-icon { font-size: 1.5rem; margin-bottom: 4px; }
 
-        /* FIXED MODAL */
+        /* MODAL */
         #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:3000; align-items: flex-end; }
         .modal-content { background: var(--card); width: 100%; height: 85vh; border-radius: 24px 24px 0 0; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 -5px 30px rgba(0,0,0,0.5); }
         .modal-header-fixed { flex-shrink: 0; background: var(--card); padding: 20px 25px; border-bottom: 1px solid var(--border); text-align: center; position: relative; z-index: 10; }
@@ -125,7 +83,13 @@
         .btn-close { width:100%; padding:15px; background: #334155; border:none; color:white; border-radius: 14px; font-weight:bold; font-size:1rem; }
         .btn-primary { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: bold; margin-top: 10px; font-size: 1rem; }
 
-        /* EXTRAS */
+        /* HISTORY LIST & PROFILE */
+        .history-list { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px; }
+        .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .history-date { font-size: 0.9rem; color: #cbd5e1; }
+        .history-weight { font-weight: bold; color: var(--accent); font-size: 1.1rem; }
+        .delete-btn { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: none; padding: 5px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
+        
         .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .report-box { background: #263346; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
         .report-value { font-size: 1.3rem; font-weight: bold; color: white; }
@@ -270,11 +234,11 @@ const mealsConfig = [
 ];
 
 let vDate = new Date();
-let appData = JSON.parse(localStorage.getItem('heli_pro_v15')) || { days: {}, weights: [], favorites: {} };
+let appData = JSON.parse(localStorage.getItem('heli_pro_v16')) || { days: {}, weights: [], favorites: {}, userProfile: {} };
 
 const getK = d => d.toLocaleDateString('he-IL').replace(/\./g, '-');
 const getISO = d => { const offset = d.getTimezoneOffset() * 60000; return new Date(d.getTime() - offset).toISOString().split('T')[0]; }
-const save = () => localStorage.setItem('heli_pro_v15', JSON.stringify(appData));
+const save = () => localStorage.setItem('heli_pro_v16', JSON.stringify(appData));
 
 function init() {
     const k = getK(vDate);
@@ -483,6 +447,7 @@ function calculateStreak() {
     document.getElementById('streak-count').innerText = s;
 }
 
+// --- WORKOUTS ---
 function openWorkouts() {
     const k = getK(vDate);
     const day = appData.days[k] || {};
@@ -541,6 +506,7 @@ function delWorkout(idx) {
     }
 }
 
+// --- REPORT & PROFILE ---
 function openReportMode() {
     const wArr = appData.weights;
     const curW = wArr.length ? wArr[wArr.length-1].w : 0;
@@ -555,28 +521,54 @@ function openReportMode() {
         d.setDate(d.getDate()-1);
     }
     
-    // BMI Calc
-    const height = 1.74; 
-    const bmi = curW ? (curW / (height*height)).toFixed(1) : '--';
-    let bmiStatus = '';
-    if(bmi < 18.5) bmiStatus = 'תת משקל';
-    else if(bmi < 25) bmiStatus = 'תקין';
-    else if(bmi < 30) bmiStatus = 'עודף משקל';
-    else bmiStatus = 'השמנה';
+    // BMI Logic
+    const profile = appData.userProfile || {};
+    let bmiDisplay = '--';
+    let bmiStatus = 'חסר גובה בפרופיל';
+    
+    if(profile.height && curW) {
+        const hM = profile.height / 100;
+        const bmi = (curW / (hM * hM)).toFixed(1);
+        bmiDisplay = bmi;
+        if(bmi < 18.5) bmiStatus = 'תת משקל';
+        else if(bmi < 25) bmiStatus = 'משקל תקין';
+        else if(bmi < 30) bmiStatus = 'עודף משקל';
+        else bmiStatus = 'השמנה';
+    }
+
+    // Weights History List
+    let historyHTML = '<div class="history-list">';
+    const revWeights = [...wArr].reverse();
+    revWeights.forEach((item, index) => {
+        // original index is needed for deletion
+        const realIndex = wArr.length - 1 - index; 
+        historyHTML += `
+            <div class="history-item">
+                <span class="history-date">${item.d}</span>
+                <span class="history-weight">${item.w} ק"ג</span>
+                <button class="delete-btn" onclick="deleteWeight(${realIndex})">מחק</button>
+            </div>
+        `;
+    });
+    historyHTML += '</div>';
 
     document.getElementById('modal-title').innerText = "דוח סיכום PRO";
     document.getElementById('modal-body').innerHTML = `
         <div class="report-grid">
             <div class="report-box"><div class="report-sub">ירידה במשקל</div><div class="report-value" style="color:${diff>0?'#10b981':'white'}">${diff} ק"ג</div></div>
             <div class="report-box"><div class="report-sub">קלוריות שרפת (30 יום)</div><div class="report-value" style="color:#8b5cf6;">🔥 ${burnSum}</div></div>
-            <div class="report-box"><div class="report-sub">BMI</div><div class="report-value" style="color:#f59e0b;">${bmi}</div><div style="font-size:0.7rem;">${bmiStatus}</div></div>
+            <div class="report-box"><div class="report-sub">BMI</div><div class="report-value" style="color:#f59e0b;">${bmiDisplay}</div><div style="font-size:0.7rem;">${bmiStatus}</div></div>
         </div>
         <h3 style="margin:15px 0 10px 0;">גרף משולב</h3>
         <div style="height:220px; background:#18212f; border-radius:12px; padding:10px;"><canvas id="repChart"></canvas></div>
+        
         <div style="margin-top:20px; display:flex; gap:10px;">
             <input type="number" id="w-input" placeholder="עדכן משקל..." step="0.1">
             <button class="btn-primary" style="margin:0; width:auto;" onclick="addW()">שמור</button>
         </div>
+        
+        <h3 style="margin-top:25px;">היסטוריית שקילות</h3>
+        ${historyHTML}
     `;
     document.getElementById('modal').style.display = 'flex';
     setTimeout(() => {
@@ -591,11 +583,59 @@ function openReportMode() {
         });
     }, 150);
 }
+
 function addW() {
     const v = parseFloat(document.getElementById('w-input').value);
     if(v) { appData.weights.push({d:getK(new Date()), w:v}); save(); openReportMode(); init(); }
 }
 
+function deleteWeight(index) {
+    if(confirm('למחוק שקילה זו?')) {
+        appData.weights.splice(index, 1);
+        save();
+        openReportMode(); // Refresh the modal
+        init(); // Refresh main screen stats
+    }
+}
+
+// --- PROFILE SETTINGS ---
+function openProfile() {
+    const p = appData.userProfile || {};
+    document.getElementById('modal-title').innerText = "פרופיל אישי";
+    document.getElementById('modal-body').innerHTML = `
+        <div style="padding:10px;">
+            <label>גובה (ס"מ)</label>
+            <input type="number" id="p-height" value="${p.height || ''}" placeholder="למשל 175">
+            
+            <label>גיל</label>
+            <input type="number" id="p-age" value="${p.age || ''}" placeholder="למשל 30">
+            
+            <label>מין</label>
+            <select id="p-gender">
+                <option value="male" ${p.gender === 'male' ? 'selected' : ''}>זכר</option>
+                <option value="female" ${p.gender === 'female' ? 'selected' : ''}>נקבה</option>
+            </select>
+            
+            <button class="btn-primary" onclick="saveProfile()">שמור פרופיל</button>
+            <p style="font-size:0.8rem; color:#666; margin-top:10px;">* הנתונים משמשים לחישוב BMI בלבד ונשמרים בטלפון שלך.</p>
+        </div>
+    `;
+    document.getElementById('modal').style.display = 'flex';
+}
+
+function saveProfile() {
+    appData.userProfile = {
+        height: parseInt(document.getElementById('p-height').value),
+        age: parseInt(document.getElementById('p-age').value),
+        gender: document.getElementById('p-gender').value
+    };
+    save();
+    alert('הפרופיל נשמר בהצלחה!');
+    closeModal();
+    init(); // To update any potential stats dependent on profile
+}
+
+// --- TIPS & TOOLS ---
 function openNaturalDetox() {
     const tips = [
         { organ: "ריאות", icon: "🫁", foods: "אננס, ג'ינג'ר, שום", color: "#fca5a5" },
@@ -628,6 +668,7 @@ function openNaturalDetox() {
 function openTools() {
     document.getElementById('modal-title').innerText = "כלים";
     document.getElementById('modal-body').innerHTML = `
+        <button class="btn-primary" onclick="openProfile()" style="background:#3b82f6; margin-bottom:12px;">👤 פרופיל אישי</button>
         <button class="btn-primary" onclick="openNaturalDetox()" style="background:#10b981; margin-bottom:12px;">🍏 המלצות: אוכל הוא תרופה</button>
         <button class="btn-primary" onclick="genShop()" style="background:#475569; margin-bottom:12px;">🛒 רשימת קניות</button>
         <button class="btn-primary" onclick="expData()" style="background:#475569; margin-bottom:12px;">💾 גיבוי נתונים</button>
