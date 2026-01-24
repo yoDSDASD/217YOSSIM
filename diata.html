@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Heli 1200 PRO V13 - Masterpiece</title>
+    <title>Heli 1200 PRO V14</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
@@ -18,28 +18,40 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; touch-action: manipulation; }
         body { font-family: 'Rubik', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 12px; padding-bottom: 100px; overflow-x: hidden; }
         
-        /* Layout & Utilities */
+        /* --- HEADER --- */
         .header-container { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
         .top-row { display: flex; justify-content: space-between; align-items: center; }
+        
         .date-trigger-wrapper { position: relative; display: flex; align-items: center; gap: 8px; background: var(--card); padding: 6px 12px; border-radius: 12px; border: 1px solid var(--border); }
         .native-date-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; z-index: 10; cursor: pointer; }
-        .streak-badge { background: rgba(245, 158, 11, 0.2); color: var(--warning); padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; cursor: pointer; }
 
-        /* Current Meal */
-        .current-meal-bar { background: linear-gradient(90deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.05) 100%); border: 1px solid var(--accent); color: #60a5fa; padding: 10px; border-radius: 12px; text-align: center; font-weight: bold; font-size: 1rem; box-shadow: 0 0 15px rgba(59, 130, 246, 0.15); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
+        .streak-badge { background: rgba(245, 158, 11, 0.15); color: var(--warning); padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; border: 1px solid rgba(245, 158, 11, 0.3); }
 
-        /* Motivation */
-        .motivation-box { width: 100%; text-align: center; font-size: 0.9rem; line-height: 1.4; color: #cbd5e1; font-style: italic; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px dashed var(--border); white-space: normal; word-wrap: break-word; }
+        .current-meal-bar {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.05) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            color: #93c5fd;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
 
-        /* Stats */
+        .motivation-box {
+            width: 100%; text-align: center; font-size: 0.9rem; line-height: 1.4; color: #cbd5e1; font-style: italic;
+            padding: 10px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px dashed var(--border);
+            white-space: normal; word-wrap: break-word;
+        }
+
+        /* --- STATS --- */
         .header-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat-card { background: var(--card); padding: 15px 5px; border-radius: var(--radius); text-align: center; border: 1px solid var(--border); }
         .stat-val { font-size: 1.4rem; font-weight: 700; color: var(--accent); }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; }
         .danger-text { color: var(--danger) !important; }
 
-        /* Cards General */
+        /* --- CARDS & MEALS --- */
         .water-card { background: linear-gradient(135deg, #1e3a8a 0%, #172554 100%); padding: 18px; border-radius: var(--radius); margin-bottom: 20px; color: white; box-shadow: 0 4px 20px rgba(30, 64, 175, 0.4); }
         .progress-bg { background: rgba(255,255,255,0.2); height: 14px; border-radius: 10px; overflow: hidden; margin: 12px 0; }
         .progress-fill { height: 100%; background: #60a5fa; width: 0%; transition: width 0.3s; }
@@ -47,18 +59,26 @@
         .water-btn { flex: 1; background: rgba(255,255,255,0.25); border: none; color: white; padding: 12px; border-radius: 10px; font-weight: bold; font-size: 1rem; cursor: pointer; }
 
         .meal-card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; border: 1px solid var(--border); transition: 0.3s; }
-        .meal-card.active-now { border: 2px solid var(--accent); box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); transform: scale(1.01); }
+        .meal-card.active-now { border: 2px solid var(--accent); box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
         .meal-card.completed { border-color: var(--success); background: rgba(16, 185, 129, 0.05); }
         
-        /* Select with Star */
+        /* CLEAN SELECT STYLE */
         .select-wrapper { position: relative; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
-        select { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 16px; appearance: none; margin: 0; }
-        .fav-btn { background: none; border: none; font-size: 1.5rem; color: #475569; cursor: pointer; padding: 0 5px; transition: color 0.2s; }
-        .fav-btn.is-fav { color: #fbbf24; }
+        select { flex: 1; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 16px; appearance: none; margin: 0; transition: border-color 0.2s; }
+        select:focus { border-color: var(--accent); }
+        
+        .fav-btn { 
+            background: #263346; border: 1px solid var(--border); 
+            width: 45px; height: 48px; border-radius: 12px; 
+            font-size: 1.4rem; color: #64748b; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .fav-btn.is-fav { color: #fbbf24; border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
 
         input[type="text"], input[type="number"] { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: #0f172a; color: white; font-size: 16px; margin-bottom: 10px; appearance: none; }
 
-        /* Cheat Meal */
+        /* --- CHEAT MEAL --- */
         .cheat-meal-container { background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); padding: 16px; border-radius: 12px; margin-bottom: 20px; }
         .cheat-header { display: flex; justify-content: space-between; align-items: center; }
         .switch { position: relative; display: inline-block; width: 52px; height: 28px; z-index: 5; }
@@ -69,43 +89,75 @@
         input:checked + .slider:before { transform: translateX(24px); }
         #cheat-details { margin-top: 15px; border-top: 1px solid rgba(245, 158, 11, 0.2); padding-top: 15px; display: none; }
 
-        /* Workouts */
+        /* --- WORKOUTS --- */
         .workout-card { background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); padding: 16px; border-radius: 12px; margin-bottom: 20px; }
         .workout-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .workout-list-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center; font-size: 0.9rem; }
 
-        /* Nav */
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); padding: 8px 0 25px 0; display: flex; justify-content: space-evenly; border-top: 1px solid var(--border); z-index: 2000; }
+        /* --- NAV --- */
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.98); padding: 8px 0 25px 0; display: flex; justify-content: space-evenly; border-top: 1px solid var(--border); z-index: 2000; backdrop-filter: blur(10px); }
         .nav-item { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 60px; height: 50px; color: var(--text-muted); background: none; border: none; font-size: 0.7rem; }
         .nav-item.active { color: var(--accent); }
         .nav-icon { font-size: 1.5rem; margin-bottom: 4px; }
 
-        /* Modals */
+        /* --- MODAL FIXED HEADER FIX --- */
         #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:3000; align-items: flex-end; }
-        .modal-content { background: var(--card); width: 100%; height: 90vh; border-radius: 24px 24px 0 0; padding: 25px; overflow: hidden; display: flex; flex-direction: column; }
-        .modal-header-fixed { flex-shrink: 0; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
-        .modal-title { margin: 0; color: var(--accent); }
-        .modal-body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 20px; }
-        .modal-footer-fixed { flex-shrink: 0; padding-top: 10px; }
-        .btn-close { width:100%; padding:18px; background: #334155; border:none; color:white; border-radius: 14px; font-weight:bold; font-size:1.1rem; }
+        
+        .modal-content { 
+            background: var(--card); 
+            width: 100%; 
+            height: 85vh; /* קצת פחות מ-90 כדי לא להידבק למעלה */
+            border-radius: 24px 24px 0 0; 
+            overflow: hidden; /* מבטל גלילה של הקונטיינר */
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 0 -5px 30px rgba(0,0,0,0.5);
+        }
+        
+        /* כותרת נעוצה */
+        .modal-header-fixed {
+            flex-shrink: 0;
+            background: var(--card);
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .modal-title { margin: 0; color: var(--accent); font-size: 1.3rem; }
+
+        /* גוף נגלל */
+        .modal-body { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 20px 25px;
+            -webkit-overflow-scrolling: touch; 
+        }
+        
+        /* פוטר נעוץ */
+        .modal-footer-fixed {
+            flex-shrink: 0;
+            background: var(--card);
+            padding: 15px 25px 25px 25px; /* פדינג תחתון גדול יותר לאייפון */
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-close { width:100%; padding:15px; background: #334155; border:none; color:white; border-radius: 14px; font-weight:bold; font-size:1rem; }
         .btn-primary { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: bold; margin-top: 10px; font-size: 1rem; }
 
-        /* Badges Grid */
-        .badges-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
-        .badge-item { background: #0f172a; padding: 15px 5px; border-radius: 12px; border: 1px solid var(--border); opacity: 0.5; filter: grayscale(1); }
-        .badge-item.unlocked { opacity: 1; filter: grayscale(0); border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
-        .badge-icon { font-size: 2rem; margin-bottom: 5px; display: block; }
-        .badge-name { font-size: 0.7rem; color: #fff; }
-
-        /* Tips */
-        .tips-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        .tip-card { background: #1e293b; border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; }
-        .tip-icon { font-size: 2rem; background: rgba(255,255,255,0.05); width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; flex-shrink: 0; }
-        
-        /* Report */
+        /* --- REPORT GRID --- */
         .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .report-box { background: #263346; padding: 15px; border-radius: 12px; text-align: center; border: 1px solid var(--border); }
         .report-value { font-size: 1.3rem; font-weight: bold; color: white; }
+        .report-sub { font-size: 0.8rem; color: #aaa; margin-top: 2px; }
+
+        /* --- TIPS STYLE --- */
+        .tips-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .tip-card { background: #1e293b; border: 1px solid var(--border); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 15px; }
+        .tip-icon { font-size: 2rem; background: rgba(255,255,255,0.05); width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 50%; flex-shrink: 0; }
+        .tip-content h4 { margin: 0 0 5px 0; color: #fff; font-size:1rem; }
+        .tip-content p { margin: 0; color: var(--text-muted); font-size: 0.85rem; line-height:1.4; }
     </style>
 </head>
 <body>
@@ -117,7 +169,7 @@
             <span style="font-size:1.3rem;">📅</span>
             <div id="cur-date-display" style="font-weight:bold; font-size:0.9rem;">היום</div>
         </div>
-        <div class="streak-badge" onclick="openBadges()">
+        <div class="streak-badge" onclick="alert('התמד יום יום כדי להגדיל את הרצף!')">
             🔥 <span id="streak-count">0</span>
         </div>
     </div>
@@ -240,11 +292,11 @@ const mealsConfig = [
 ];
 
 let vDate = new Date();
-let appData = JSON.parse(localStorage.getItem('heli_pro_v13')) || { days: {}, weights: [], favorites: {} };
+let appData = JSON.parse(localStorage.getItem('heli_pro_v14')) || { days: {}, weights: [], favorites: {} };
 
 const getK = d => d.toLocaleDateString('he-IL').replace(/\./g, '-');
 const getISO = d => { const offset = d.getTimezoneOffset() * 60000; return new Date(d.getTime() - offset).toISOString().split('T')[0]; }
-const save = () => localStorage.setItem('heli_pro_v13', JSON.stringify(appData));
+const save = () => localStorage.setItem('heli_pro_v14', JSON.stringify(appData));
 
 function init() {
     const k = getK(vDate);
@@ -288,7 +340,6 @@ function init() {
                     <div class="select-wrapper">
                         <select id="sel_${i}_${pi}" onchange="upd('${k}', '${i}_${pi}', this.value)">
                             <option value="">בחר...</option>
-                            <option value="custom">✏️ הוסף אישי...</option>
                             ${sortedOptions.map(x => {
                                 const isHeader = x.includes("---");
                                 const isFav = favorites.includes(x);
@@ -296,7 +347,7 @@ function init() {
                                 return `<option value="${isHeader?'':x}" ${isHeader?'disabled style="color:var(--accent); font-weight:bold; background:#1e293b;"':''} ${day[`${i}_${pi}`]===x?'selected':''}>${label}</option>`;
                             }).join('')}
                         </select>
-                        <button class="fav-btn" onclick="toggleFav('${categoryKey}', 'sel_${i}_${pi}')">☆</button>
+                        <button class="fav-btn ${favorites.includes(day[`${i}_${pi}`]) ? 'is-fav' : ''}" onclick="toggleFav('${categoryKey}', 'sel_${i}_${pi}')">★</button>
                     </div>
                 </div>`;
             }).join('')}
@@ -365,17 +416,15 @@ function sortOptionsWithFavorites(options, favorites) {
 function toggleFav(category, selectId) {
     const select = document.getElementById(selectId);
     const val = select.value;
-    if(!val || val === "custom") return alert("יש לבחור פריט כדי להוסיף למועדפים");
+    if(!val) return alert("יש לבחור פריט כדי להוסיף למועדפים");
     
     if(!appData.favorites[category]) appData.favorites[category] = [];
     
     const index = appData.favorites[category].indexOf(val);
     if(index > -1) {
         appData.favorites[category].splice(index, 1);
-        alert("הוסר ממועדפים");
     } else {
         appData.favorites[category].push(val);
-        alert("נוסף למועדפים! יופיע בראש הרשימה.");
     }
     save();
     init();
@@ -395,11 +444,6 @@ function updateCurrentMealIndicator() {
 }
 
 function upd(k, id, val) {
-    if(val === "custom") {
-        const custom = prompt("הכנס שם של פריט:");
-        if(custom) val = custom;
-        else return; 
-    }
     if(!appData.days[k]) appData.days[k]={};
     appData.days[k][id] = val;
     save();
@@ -534,8 +578,7 @@ function openReportMode() {
     }
     
     // BMI Calc
-    // Assuming default height if not set (or could add input for it)
-    const height = 1.74; // Based on your previous data
+    const height = 1.74; 
     const bmi = curW ? (curW / (height*height)).toFixed(1) : '--';
     let bmiStatus = '';
     if(bmi < 18.5) bmiStatus = 'תת משקל';
@@ -600,29 +643,6 @@ function openNaturalDetox() {
     html += '</div>';
 
     document.getElementById('modal-title').innerText = "אוכל הוא תרופה: ניקוי רעלים";
-    document.getElementById('modal-body').innerHTML = html;
-    document.getElementById('modal').style.display = 'flex';
-}
-
-function openBadges() {
-    const streak = parseInt(document.getElementById('streak-count').innerText) || 0;
-    const badges = [
-        { n: "מתחילים", i: "🥉", r: 3 },
-        { n: "מתמידים", i: "🥈", r: 7 },
-        { n: "אלופים", i: "🥇", r: 14 },
-        { n: "מאסטרים", i: "🏆", r: 30 },
-        { n: "אגדות", i: "👑", r: 60 },
-        { n: "מים", i: "💧", r: 0 } // Logic needed for water badge separately
-    ];
-    
-    let html = '<div class="badges-grid">';
-    badges.forEach(b => {
-        const unlocked = streak >= b.r;
-        html += `<div class="badge-item ${unlocked?'unlocked':''}"><span class="badge-icon">${b.i}</span><span class="badge-name">${b.n} (${b.r}+ ימים)</span></div>`;
-    });
-    html += '</div><p style="text-align:center; font-size:0.8rem; margin-top:15px; color:#888;">התמד ביומן כדי לפתוח גביעים!</p>';
-    
-    document.getElementById('modal-title').innerText = "היכל התהילה";
     document.getElementById('modal-body').innerHTML = html;
     document.getElementById('modal').style.display = 'flex';
 }
