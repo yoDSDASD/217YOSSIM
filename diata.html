@@ -3,201 +3,335 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Heli 1200 Dark - Ultimate Fixed</title>
+    <title>Heli 1200 Dark - Precision Timing</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        :root { --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --accent: #4dabf7; --success: #00e676; --danger: #ff5252; --border: #333; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px 10px 100px 10px; }
-        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; position: sticky; top: 5px; z-index: 900; background: var(--bg); padding-bottom: 10px; }
-        .stat-box { background: #252525; padding: 10px; border-radius: 12px; text-align: center; border: 1px solid var(--border); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .stat-val { font-size: 1.3rem; font-weight: bold; display: block; }
-        .card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); }
-        h3 { color: var(--accent); margin: 0 0 10px 0; border-bottom: 1px solid #333; padding-bottom: 8px; display: flex; justify-content: space-between; }
-        select, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); background: #2c2c2c; color: #fff; font-size: 16px; margin-bottom: 12px; }
-        button { cursor: pointer; }
-        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; padding: 12px; display: flex; gap: 10px; border-top: 1px solid #333; z-index: 1000; }
-        .nav-btn { flex: 1; background: #333; color: var(--text); padding: 12px; border-radius: 8px; border: none; font-weight: bold; }
-        .del-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-        td, th { padding: 8px; border-bottom: 1px solid #333; text-align: right; }
+        :root { 
+            --bg: #121212; 
+            --card: #1e1e1e; 
+            --text: #e0e0e0; 
+            --accent: #2979ff; 
+            --success: #00e676; 
+            --danger: #ff5252;
+            --border: #333;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 12px; padding-bottom: 90px; }
+        
+        /* Motivation Header */
+        .motivation-bar { background: linear-gradient(90deg, #1565c0, #0d47a1); color: #fff; padding: 15px; border-radius: 12px; text-align: center; font-weight: bold; margin-bottom: 15px; border: 1px solid #333; box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+        
+        /* Stats Grid */
+        .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; position: sticky; top: 10px; z-index: 100; }
+        .stat-box { background: rgba(30, 30, 30, 0.95); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid var(--border); backdrop-filter: blur(5px); box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        .stat-label { font-size: 0.7rem; color: #aaa; margin-bottom: 2px; }
+        .stat-val { font-size: 1.3rem; font-weight: bold; }
+        
+        /* Meal Cards */
+        .card { background: var(--card); border-radius: 16px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); position: relative; }
+        .meal-header { display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 8px; margin-bottom: 12px; align-items: center; }
+        h3 { color: var(--accent); margin: 0; font-size: 1.1rem; }
+        .meal-time { background: #333; color: #fff; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
+        
+        /* Inputs & Selects */
+        label { font-size: 0.8rem; color: #888; display: block; margin-bottom: 4px; }
+        select, input { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--border); background: #2c2c2c; color: #fff; font-size: 0.95rem; margin-bottom: 12px; appearance: none; }
+        select:focus, input:focus { border-color: var(--accent); outline: none; }
+        
+        /* Weight Section */
+        #weight-section { border: 1px solid var(--accent); box-shadow: 0 0 15px rgba(41, 121, 255, 0.1); }
+        .weight-history-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #333; font-size: 0.9rem; }
+        .del-btn { background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 5px; }
+        
+        /* Bottom Nav */
+        .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1a1a1a; padding: 12px; display: flex; gap: 10px; border-top: 1px solid #333; z-index: 1000; box-shadow: 0 -5px 20px rgba(0,0,0,0.7); }
+        .nav-btn { flex: 1; background: #333; color: var(--text); padding: 12px; border-radius: 8px; border: none; font-weight: bold; font-size: 0.9rem; }
+        .nav-btn.primary { background: var(--accent); color: #000; }
+
+        /* Modal */
+        #modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; justify-content:center; align-items:center; }
+        .modal-content { background: var(--card); width: 90%; max-height: 85%; border-radius: 15px; padding: 20px; overflow-y: auto; border: 1px solid var(--border); }
+        .guidelines-list li { margin-bottom: 8px; line-height: 1.5; color: #ddd; font-size: 0.95rem; }
     </style>
 </head>
 <body>
 
+<div id="quote" class="motivation-bar">יוסף, הדיוק בפרטים הקטנים הוא סוד ההצלחה!</div>
+
 <div class="stats-row">
     <div class="stat-box">
-        <span style="font-size:0.8rem; color:#aaa">קלוריות</span>
-        <span id="cal-count" class="stat-val" style="color:var(--accent)">0</span>
+        <div class="stat-label">קלוריות היום</div>
+        <div id="cal-count" class="stat-val" style="color: var(--accent);">0</div>
     </div>
     <div class="stat-box">
-        <span style="font-size:0.8rem; color:#aaa">משקל</span>
-        <span id="last-weight" class="stat-val">--</span>
+        <div class="stat-label">משקל נוכחי</div>
+        <div id="last-weight" class="stat-val" style="color: #fff;">--</div>
     </div>
-    <div class="stat-box" style="border:1px solid var(--success)">
-        <span style="font-size:0.8rem; color:#aaa">סה״כ ירידה</span>
-        <span id="total-lost" class="stat-val" style="color:var(--success)">0</span>
+    <div class="stat-box" style="border-color: var(--success);">
+        <div class="stat-label">ירדתי סה״כ</div>
+        <div id="total-lost" class="stat-val" style="color: var(--success);">0</div>
     </div>
 </div>
 
 <div id="app"></div>
 
-<div class="card">
-    <h3>📉 ארכיון משקל</h3>
-    <div style="display:flex; gap:10px;">
-        <input type="number" id="w-in" step="0.1" placeholder="ק״ג" style="flex:1">
-        <button onclick="addW()" style="background:var(--success); border:none; border-radius:8px; padding:0 20px; font-weight:bold;">שמור</button>
+<div class="card" id="weight-section">
+    <div class="meal-header">
+        <h3>📉 מעקב ירידה במשקל</h3>
     </div>
-    <canvas id="wChart" style="max-height:180px; width:100%; margin:15px 0;"></canvas>
-    <div style="max-height:200px; overflow-y:auto;">
-        <table>
-            <tbody id="w-history-body"></tbody>
-        </table>
+    <div style="display:flex; gap:10px; margin-bottom:15px;">
+        <input type="number" id="w-in" step="0.1" placeholder="הזן משקל עדכני..." style="flex:1; margin:0;">
+        <button onclick="addW()" style="background:var(--success); color:#000; border:none; border-radius:10px; padding:0 20px; font-weight:bold;">שמור</button>
+    </div>
+    <canvas id="wChart" style="max-height:200px; width:100%;"></canvas>
+    <div style="margin-top:20px; max-height:200px; overflow-y:auto;">
+        <div style="font-size:0.8rem; color:#888; margin-bottom:5px;">היסטוריית שקילות (לחץ על הפח למחיקה):</div>
+        <div id="w-history"></div>
     </div>
 </div>
 
 <div class="nav-bar">
-    <button class="nav-btn" onclick="changeDate(-1)">◄</button>
-    <button class="nav-btn" onclick="openReport()">סיכום</button>
-    <button class="nav-btn" onclick="changeDate(1)">►</button>
+    <button class="nav-btn" onclick="changeDate(-1)">◄ יום קודם</button>
+    <button class="nav-btn" onclick="openReport()">📄 סיכום</button>
+    <button class="nav-btn primary" onclick="openInfo()">ℹ️ דגשים</button>
+    <button class="nav-btn" onclick="changeDate(1)">יום הבא ►</button>
 </div>
 
-<div id="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:2000; justify-content:center; align-items:center;">
-    <div style="background:var(--card); width:90%; max-height:85%; border-radius:15px; padding:20px; overflow-y:auto;">
-        <h2 id="modal-title" style="text-align:center; color:var(--accent)"></h2>
-        <div id="modal-body" style="color:#ccc; line-height:1.6"></div>
-        <button onclick="document.getElementById('modal').style.display='none'" style="width:100%; margin-top:20px; background:var(--danger); color:white; padding:12px; border:none; border-radius:8px;">סגור</button>
+<div id="modal">
+    <div class="modal-content">
+        <h2 id="modal-title" style="text-align:center; border-bottom:1px solid #333; padding-bottom:10px; color:var(--accent);"></h2>
+        <div id="modal-body"></div>
+        <button onclick="closeModal()" style="width:100%; margin-top:20px; background:var(--danger); color:white; padding:12px; border:none; border-radius:10px; font-weight:bold;">סגור</button>
     </div>
 </div>
 
 <script>
+// --- FULL 100% DATABASE (From your file) ---
 const DB = {
-    carbs: ["1 פיתה קלה (עד 80 קלוריות)", "1 פרוסת לחם רגיל", "2 פרוסות לחם קל", "1/3 פיתה רגילה", "1 לחמנייה קלה", "30 גרם לחמנייה", "1/2 מצה", "1 מצה קלה", "3 פתית", "3 קרקרים דגנית", "2 פירכיות אורז/שועל", "10 פירכיות ביס", "1/2 טורטיה", "1 עלה סיגר גדול", "5 דפי אורז", "2 כפות קמח/סולת", "1/2 כוס אורז/פסטה/פתיתים (מבושל)", "1 תפוח אדמה בינוני", "1/2 בטטה קטנה", "1 קלח תירס", "3/4 כוס תירס קל", "1 שקית במבה קטנה (15ג)", "שקית פופקורן (100 קל)", "2 כוסות פופקורן ביתי", "10 בייגלה קטן", "1 שקית צ'יפס קידס", "2 פתי בר", "1 חטיף אנרגיה (100 קל)"],
-    cheese: ["2 כפות גבינה 5%", "60 גרם בולגרית/צפתית 5%", "1 פרוסת צהובה 9%", "2 פרוסות צהובה דק-דק", "1 פרוסת צהובה 22% (פעם ביום)", "1 מעדן 0% (80 קל)", "1 יוגורט 1.5%", "1 כוס חלב 1%", "1 כוס חלב סויה", "1 ביצה", "1/2 קופסה טונה במים", "3 פלאפל אפוי", "80 גרם דג מבושל", "60 גרם טופו"],
-    meat: ["חזה עוף (150ג לפני/100ג אחרי)", "בקר רזה/עגל/פילה", "1/4 עוף ללא עור", "3 שוקי עוף", "3 קציצות בקר", "שווארמה הודו (150ג)", "דג אפוי (200ג לפני/150ג אחרי)", "1.5 קופסאות טונה במים", "1 קופסת טונה בשמן (מסונן)", "150 גרם טופו", "2 שניצל טבעול (עד פעמיים בשבוע)", "1 המבורגר (פעם בשבוע)"],
-    fruit: ["תפוח", "אגס", "בננה קטנה", "כוס אבטיח/מלון", "2 שזיפים", "אפרסק", "2 קלמנטינות", "2 תמרים יבשים", "1 תמר מג'הול", "חצי מנגו", "כוס ענבים"],
-    fat: ["כפית שמן", "כף טחינה מוכנה", "כף אבוקדו", "6 זיתים קטנים", "כף חומוס", "7 שקדים", "3 אגוזי מלך", "10 בוטנים", "כפית חמאה", "כף מיונז קל"],
-    half: ["פרוסת צהובה 5%", "כף גבינה 5%", "חצי צהובה 9%", "30 גרם בולגרית", "כפית חומוס", "חצי כוס חלב 1%", "1/4 טונה במים", "חצי ביצה", "2 פסטרמה", "1.5 פלאפל אפוי", "חצי כוס שוקו 0%", "חצי כוס גלידה דיאט", "משולש מון בלאן"]
+    carbs: [
+        "1 פיתה קלה (עד 80 קלוריות ליחידה)", "1 פרוסת לחם רגיל", "2 פרוסות לחם קל", "1/3 פיתה רגילה", 
+        "1 לחמנייה קלה (עד 80 קלוריות)", "30 גרם לחמנייה מכל סוג", "1/2 מצה", "1 מצה קלה", "3 פתית", 
+        "3 קרקרים דגנית בייגל בייגל", "2 פירכיות שיבולת שוער/אורז", "2 לחמית/קרקר זהב", "10 פירכיות ביס", 
+        "6 טוסטעים מלבניים", "1/2 טורטיה גדולה", "1 עלה סיגר גדול או 2 קטנים", "5 דפי אורז", "1 כף שקדי מרק", 
+        "2 כפות קמח שטוחות", "2 כפות סולת שטוחות", "2 כפות פירורי לחם לא מטוגנים", "חצי דלורית קטנה", 
+        "1/2 כוס אפונה ירוקה", "1 סלק בינוני", "1 כוס נבטוטים", "1.5 כוס תרמילי אדממה", 
+        "1/3 דלעת ערמונים / דלעת ספגטי", "8 תחתיות ארטישוק", "100 גרם ארטישוק ירושלמי", 
+        "--- מתוקים (אחד ביום) ---", "2 פתי בר", "2 עוגיות ללא סוכר", "1 חטיף אנרגיה (עד 100 קל')", 
+        "3/4 כוס קורנפלקס ללא סוכר", "2 כפות גרנולה ללא סוכר", 
+        "--- פחמימות מבושלות (1/2 כוס אחרי בישול) ---", "אורז", "בורגול", "כוסמת", "קוסקוס", "פתיתים", "פסטה", 
+        "קינואה", "תירס", "קטניות (חומוס, שעועית, עדשים, פול)", "1 תפוח אדמה בינוני", "1/2 בטטה קטנה", 
+        "1 קלח תירס קטן", "3/4 כוס תירס קל", "5 מקלות צ'יפס רגיל", "3 יחידות עלי גפן", "7 ערמונים", "1/2 כוס פירה",
+        "--- חטיפים (עד 3 פעמים בשבוע) ---", "1 שקית במבה קטנה (15 גרם)", "שקית פופקורן (עד 100 קל')", 
+        "2 כוסות פופקורן ביתי ללא שמן", "1 כוס פופקורן עם שמן", "10 יח' בייגלה קטן", "1 שקית צ'יפס קידס"
+    ],
+    cheese: [
+        "2 כפות גבינה 3%-5% (קוטג', לבנה, סימפוניה)", "2 משולשי מון בלאן", "60 גרם גבינה קשה עד 5% (צפתית/בולגרית)", 
+        "2 כפות ממרח טופו (עד 5%)", "1 אצבע מוצרלה", "1 פרוסת צהובה 9%", "2 פרוסות צהובה 9% דק-דק", 
+        "1 פרוסת צהובה 22% (פעם ביום)", "1 גביע מעדן/יוגורט 0% (עד 80 קל')", "1 גביע יוגורט טבעי 1.5%", 
+        "משקה בוקר 0%", "כוס שוקו 0%", "יחידת אקטימל 3%", "3/4 כוס רוויון", "כוס גלידה דיאט 2%-5%", 
+        "1 שלגון חלבי עד 80 קל'", "1 כוס חלב 1%", "1 כוס חלב סויה ללא סוכר", "1/2 כוס פולי סויה", "60 גרם טופו", 
+        "1 ביצה", "חצי קופסא טונה במים", "1.5 כף טונה בשמן", "50 גרם ממרח טונה/סלמון", "3 כדורי פלאפל אפויים", 
+        "80 גרם דג מבושל", "1/2 כוס חלב 3% (פעמיים בשבוע)", "100 מ\"ל שמנת אלפרו 5%", "1 כוס חלב שקדים ללא סוכר"
+    ],
+    meat: [
+        "--- בשר (150ג' לפני / 100ג' אחרי) ---", "חזה עוף", "בקר ללא שומן (עגל/פילה)", "1/4 עוף (ללא עור)", 
+        "3 שוקי עוף (פולקע)", "שווארמה הודו (150 גרם)", "3 קציצות בקר", "2 שיפודי עוף/פרגית", "3 כדורי בשר רזה",
+        "--- דגים (200ג' לפני / 150ג' אחרי) ---", "דג אפוי/מבושל (אמנון, דניס, סלמון, טונה)", 
+        "1.5 קופסאות טונה במים", "1 קופסת טונה בשמן מסוננת", "1 קופסת סרדינים מסוננים",
+        "--- תחליפים ---", "6 כדורי פלאפל אפויים", "1.5 כוסות קטניות מבושלות", "3 כפות חומוס", "150 גרם טופו",
+        "2 שניצל טבעול (עד פעמיים בשבוע)", "1 המבורגר בתנור (פעם בשבוע)", "3 נקניקיות (פעם בשבוע)"
+    ],
+    fat: [
+        "1 כפית שמן מכל סוג", "6 זיתים קטנים", "2 זיתים גדולים", "1 כף טחינה מוכנה", "1 כפית טחינה גולמית", 
+        "1 כף אבוקדו", "1 כפית חומוס", "1 כף זרעי פשתן/צ'יה", "1 כף קוקוס טחון", "2 כפות שמנת חמוצה 15%", 
+        "1 כפית חמאה", "5 כפות שמנת אלפרו 5%", "7 שקדים", "3 אגוזי מלך/פקאן", "10 בוטנים/פיסטוקים", 
+        "1 כפית מיונז", "1 כף כמויונז", "1 כף ממרח שומשום", "10 גרם חלווה"
+    ],
+    fruit: [
+        "תפוח עץ", "אגס בינוני", "בננה קטנה", "1 כוס קוביות אבטיח/מלון", "2 שזיפים", "1 אפרסק", "1 נקטרינה", 
+        "1 אפרסמון קטן", "1/2 אשכולית", "1/2 מנגו", "1 כוס ענבים/דובדבנים", "2 תמרים יבשים", "1 תמר מג'הול", 
+        "2 קיווי", "2 קלמנטינות", "3 משמשים", "1 חבוש קטן", "1/3 פומלה"
+    ],
+    half_cheese: [
+        "פרוסת גבינה צהובה 5%", "כף גבינה 5%", "חצי פרוסה צהובה 9%", "30 גרם בולגרית", "כפית חומוס", 
+        "חצי כוס חלב 1%", "1/4 קופסת טונה במים", "חצי ביצה", "2 פרוסות פסטרמה"
+    ]
 };
 
-const meals = [
-    { n: "בוקר", c: 200, p: [{l:"פחמימה", d:DB.carbs}, {l:"גבינה", d:DB.cheese}] },
-    { n: "ביניים", c: 150, p: [{l:"פרי", d:DB.fruit}, {l:"שומן", d:DB.fat}] },
-    { n: "צהריים", c: 350, p: [{l:"בשר", d:DB.meat}, {l:"פחמימה", d:DB.carbs}, {l:"שומן", d:DB.fat}] },
-    { n: "אחה״צ", c: 150, p: [{l:"פחמימה", d:DB.carbs}, {l:"פרי", d:DB.fruit}, {l:"שומן", d:DB.fat}] },
-    { n: "ערב", c: 250, p: [{l:"פחמימה", d:DB.carbs}, {l:"גבינה", d:DB.cheese}, {l:"חצי חלבון", d:DB.half}, {l:"שומן", d:DB.fat}] },
-    { n: "לילה", c: 100, p: [{l:"גבינה", d:DB.cheese}, {l:"פרי", d:DB.fruit}] }
+const mealsConfig = [
+    { n: "ארוחת בוקר", t: "09:00", c: 200, p: [{l: "פחמימה", d: DB.carbs}, {l: "חלבון גבינה", d: DB.cheese}] },
+    { n: "ביניים בוקר", t: "", c: 150, p: [{l: "פרי", d: DB.fruit}, {l: "שומן", d: DB.fat}] },
+    { n: "ארוחת צהריים", t: "12:00", c: 350, p: [{l: "חלבון בשר", d: DB.meat}, {l: "פחמימה", d: DB.carbs}, {l: "שומן", d: DB.fat}] },
+    { n: "ביניים אחה״צ", t: "15:00", c: 150, p: [{l: "פחמימה", d: DB.carbs}, {l: "פרי", d: DB.fruit}, {l: "שומן", d: DB.fat}] },
+    { n: "ארוחת ערב", t: "18:00", c: 250, p: [{l: "פחמימה", d: DB.carbs}, {l: "חלבון גבינה", d: DB.cheese}, {l: "חצי חלבון", d: DB.half_cheese}, {l: "שומן", d: DB.fat}] },
+    { n: "ארוחת לילה", t: "21:00", c: 100, p: [{l: "חלבון גבינה", d: DB.cheese}, {l: "פרי", d: DB.fruit}] }
 ];
 
-let vDate = new Date();
-let data = JSON.parse(localStorage.getItem('heli_v3_fixed')) || { days:{}, weights:[] };
+const guidelinesText = `
+<ul class="guidelines-list">
+<li>לא ניתן לפצל, לצרף או לדלג על ארוחות.</li>
+<li>מנה מותרת בנוסף לתפריט פעם בשבוע.</li>
+<li>כוס חלב ביום לקפה (בנוסף לתפריט).</li>
+<li>ירקות ניתן לשלב בכל ארוחה בשפיות ובצלילות הדעת.</li>
+<li>יש לשתות מינימום 12 כוסות מים ביום (אפשר לגוון עם תה צמחים או סודה).</li>
+<li>מומלץ לשתות כוס מים לפני ואחרי כל ארוחה.</li>
+<li>חשוב לדייק בכמויות.</li>
+<li>מומלץ לגוון את הארוחות עם תחליפים הנמצאים בחוברת ובאתר.</li>
+<li>מומלץ ללכת ברגל 3 פעמים בשבוע למשך שעה.</li>
+<li>מזון המכיל ממתיק מלאכותי יש לצרוך בכמויות מבוקרות.</li>
+<li>מומלץ שהלחם והפחמימות יהיו מדגנים מלאים (כלחם, אורז, פסטה ועוד).</li>
+<li>מומלץ להתחיל לאכול את הארוחה הראשונה עד שעה מהיקיצה.</li>
+<li>המרווח בין הארוחות נע בין שעה וחצי לשלוש שעות.</li>
+<li>אין חשיבות לסדר הארוחות. ניתן להחליף ארוחה אחת בארוחה שניה במלואה.</li>
+</ul>
+`;
 
-function getK(d) { return d.toLocaleDateString('he-IL').replace(/\./g,'-'); }
+let vDate = new Date();
+let data = JSON.parse(localStorage.getItem('heli_final_yosef')) || { days:{}, weights:[] };
+
+function getK(d){ return d.toLocaleDateString('he-IL').replace(/\./g,'-'); }
 
 function init() {
     const k = getK(vDate);
+    document.getElementById('cur-date').innerText = k === getK(new Date()) ? "היום" : k;
     const day = data.days[k] || {};
     
-    document.getElementById('app').innerHTML = meals.map((m, i) => `
+    document.getElementById('app').innerHTML = mealsConfig.map((m, i) => `
         <div class="card">
-            <h3>${m.n} <span>${m.c} קל'</span></h3>
+            <div class="meal-header">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <h3>${m.n}</h3>
+                    ${m.t ? `<span class="meal-time">${m.t}</span>` : ''}
+                </div>
+                <span style="font-size:0.8rem; color:#888;">${m.c} קל'</span>
+            </div>
             ${m.p.map((part, pi) => `
-                <select onchange="updM('${k}', '${i}_${pi}', this.value)" style="${day[i+'_'+pi] ? 'border-color:var(--success); color:var(--success);' : ''}">
-                    <option value="">${part.l}...</option>
-                    ${part.d.map(x => `<option value="${x}" ${day[i+'_'+pi]===x?'selected':''}>${x}</option>`).join('')}
-                </select>
+                <div style="margin-bottom:10px;">
+                    <label>${part.l}</label>
+                    <select onchange="updM('${k}', '${i}_${pi}', this.value)">
+                        <option value="">בחר...</option>
+                        ${part.d.map(x => {
+                            const isH = x.startsWith('---');
+                            return `<option value="${isH?'':x}" ${isH?'disabled style="color:var(--accent); font-weight:bold;"':''} ${day[i+'_'+pi]===x?'selected':''}>${x}</option>`;
+                        }).join('')}
+                    </select>
+                </div>
             `).join('')}
         </div>
     `).join('');
-    calc();
+    updateStats(day);
     renderW();
 }
 
-function updM(k, id, val) {
-    if(!data.days[k]) data.days[k] = {};
-    if(val === "") delete data.days[k][id];
-    else data.days[k][id] = val;
-    save();
-    init(); // Re-render to update border colors
+function updM(k, id, v){ if(!v)return; if(!data.days[k]) data.days[k]={}; data.days[k][id]=v; save(); updateStats(data.days[k]); }
+
+function addW(){ 
+    const v = document.getElementById('w-in').value; if(!v)return;
+    data.weights.push({id: Date.now(), d:getK(new Date()), w:parseFloat(v)});
+    save(); document.getElementById('w-in').value=''; renderW();
 }
 
-function calc() {
-    const k = getK(vDate);
-    const day = data.days[k] || {};
+function delW(id){
+    if(confirm("למחוק שקילה זו?")){
+        data.weights = data.weights.filter(w => w.id !== id);
+        save(); renderW();
+    }
+}
+
+function updateStats(day){
     let t = 0;
-    meals.forEach((m, i) => {
+    mealsConfig.forEach((m, i) => {
         let active = false;
         m.p.forEach((_, pi) => { if(day[i+'_'+pi]) active = true; });
         if(active) t += m.c;
     });
     document.getElementById('cal-count').innerText = t;
-}
-
-function addW() {
-    const v = document.getElementById('w-in').value;
-    if(!v) return;
-    data.weights.push({id:Date.now(), d:getK(new Date()), w:parseFloat(v)});
-    save(); document.getElementById('w-in').value=''; renderW();
-}
-
-function delW(id) {
-    if(confirm('למחוק?')) {
-        data.weights = data.weights.filter(x => x.id !== id);
-        save(); renderW();
-    }
-}
-
-function renderW() {
-    const sorted = [...data.weights].sort((a,b) => a.id - b.id);
-    const list = document.getElementById('w-history-body');
     
-    if(sorted.length) {
-        const cur = sorted[sorted.length-1].w;
-        const start = sorted[0].w;
-        document.getElementById('last-weight').innerText = cur;
-        const diff = (start - cur).toFixed(1);
-        const el = document.getElementById('total-lost');
-        el.innerText = diff > 0 ? "-"+diff : "+"+Math.abs(diff);
-        el.style.color = diff > 0 ? "var(--success)" : "var(--danger)";
-        if(diff==0) { el.innerText="0"; el.style.color="#aaa"; }
+    // Weight Stats
+    if(data.weights.length > 0) {
+        const current = data.weights[data.weights.length-1].w;
+        const first = data.weights[0].w;
+        document.getElementById('last-weight').innerText = current;
+        const diff = (first - current).toFixed(1);
+        document.getElementById('total-lost').innerText = diff > 0 ? "-" + diff : "0";
     }
+}
 
-    // Chart
+function renderW(){
+    // Draw Chart
     const ctx = document.getElementById('wChart').getContext('2d');
-    if(window.ch) window.ch.destroy();
-    window.ch = new Chart(ctx, {
+    if(window.myChart) window.myChart.destroy();
+    
+    // Sort for chart but keep raw for list
+    const sortedW = [...data.weights].sort((a,b) => a.id - b.id);
+    const d = sortedW.slice(-10); // Show last 10 points
+    
+    window.myChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: sorted.slice(-10).map(x=>x.d),
-            datasets: [{data:sorted.slice(-10).map(x=>x.w), borderColor:'#4dabf7', backgroundColor:'rgba(77,171,247,0.1)', fill:true, tension:0.4}]
+            labels: d.map(x=>x.d),
+            datasets: [{ 
+                label:'משקל', 
+                data:d.map(x=>x.w), 
+                borderColor:'#2979ff', 
+                backgroundColor:'rgba(41, 121, 255, 0.1)', 
+                fill:true, 
+                tension:0.4,
+                pointBackgroundColor: '#fff',
+                pointRadius: 4
+            }]
         },
-        options: { plugins:{legend:{display:false}}, scales:{x:{display:false}, y:{grid:{color:'#333'}}} }
+        options: {
+            plugins: { legend: {display:false} },
+            scales: { 
+                x: { display:false }, 
+                y: { grid: {color:'#333', borderDash:[5,5]} } 
+            }
+        }
     });
 
-    // List
-    list.innerHTML = [...sorted].reverse().map(x => `
-        <tr>
-            <td>${x.d}</td>
-            <td style="font-weight:bold; color:#fff">${x.w}</td>
-            <td><button class="del-btn" onclick="delW(${x.id})" style="color:var(--danger)">🗑️</button></td>
-        </tr>
+    // Render History List (Reverse Order)
+    const listHtml = [...data.weights].reverse().map(e => `
+        <div class="weight-history-item">
+            <span style="color:#aaa;">${e.d}</span>
+            <strong style="color:var(--text); font-size:1.1rem;">${e.w} ק״ג</strong>
+            <button class="del-btn" onclick="delW(${e.id})">🗑️</button>
+        </div>
     `).join('');
+    document.getElementById('w-history').innerHTML = listHtml;
+    
+    updateStats(data.days[getK(vDate)] || {});
 }
 
-function save() { localStorage.setItem('heli_v3_fixed', JSON.stringify(data)); }
-function changeDate(n) { vDate.setDate(vDate.getDate()+n); init(); }
+function save(){ localStorage.setItem('heli_final_yosef', JSON.stringify(data)); }
+function changeDate(n){ vDate.setDate(vDate.getDate()+n); init(); }
+
+function openInfo() {
+    document.getElementById('modal-title').innerText = "דגשים להצלחה - חלי ממן";
+    document.getElementById('modal-body').innerHTML = guidelinesText;
+    document.getElementById('modal').style.display = 'flex';
+}
+
 function openReport() {
     const k = getK(vDate);
     const day = data.days[k] || {};
-    let h = '';
-    meals.forEach((m,i) => {
-        h += `<div style="margin-bottom:10px; border-bottom:1px solid #333"><b>${m.n}</b><br>`;
-        m.p.forEach((p,pi) => { if(day[i+'_'+pi]) h+=`<span style="color:#aaa">• ${p.l}: ${day[i+'_'+pi]}</span><br>`; });
-        h += `</div>`;
+    let html = '';
+    mealsConfig.forEach((m, i) => {
+        html += `<div style="margin-bottom:15px; border-bottom:1px solid #333; padding-bottom:10px;">
+            <div style="display:flex; justify-content:space-between;">
+                <strong style="color:var(--accent)">${m.n}</strong>
+                ${m.t ? `<span style="font-size:0.8rem; color:#888;">${m.t}</span>` : ''}
+            </div>`;
+        m.p.forEach((p, pi) => {
+            if(day[i+'_'+pi]) html += `<div style="font-size:0.9rem;">• ${p.l}: ${day[i+'_'+pi]}</div>`;
+        });
+        html += `</div>`;
     });
-    document.getElementById('modal-title').innerText = k;
-    document.getElementById('modal-body').innerHTML = h || 'אין נתונים';
+    document.getElementById('modal-title').innerText = "סיכום יומי: " + k;
+    document.getElementById('modal-body').innerHTML = html || "לא נרשמו ארוחות ליום זה.";
     document.getElementById('modal').style.display = 'flex';
 }
+
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
 
 init();
 </script>
