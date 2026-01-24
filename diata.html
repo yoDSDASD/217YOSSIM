@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Heli 1200 PRO V16 - Profile</title>
+    <title>Heli 1200 PRO V17 - Fixes</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap" rel="stylesheet">
@@ -83,7 +83,7 @@
         .btn-close { width:100%; padding:15px; background: #334155; border:none; color:white; border-radius: 14px; font-weight:bold; font-size:1rem; }
         .btn-primary { background: var(--accent); color: white; border: none; padding: 14px; border-radius: 12px; width: 100%; font-weight: bold; margin-top: 10px; font-size: 1rem; }
 
-        /* HISTORY LIST & PROFILE */
+        /* HISTORY LIST */
         .history-list { margin-top: 20px; border-top: 1px solid var(--border); padding-top: 15px; }
         .history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .history-date { font-size: 0.9rem; color: #cbd5e1; }
@@ -234,11 +234,11 @@ const mealsConfig = [
 ];
 
 let vDate = new Date();
-let appData = JSON.parse(localStorage.getItem('heli_pro_v16')) || { days: {}, weights: [], favorites: {}, userProfile: {} };
+let appData = JSON.parse(localStorage.getItem('heli_pro_v17')) || { days: {}, weights: [], favorites: {}, userProfile: {} };
 
 const getK = d => d.toLocaleDateString('he-IL').replace(/\./g, '-');
 const getISO = d => { const offset = d.getTimezoneOffset() * 60000; return new Date(d.getTime() - offset).toISOString().split('T')[0]; }
-const save = () => localStorage.setItem('heli_pro_v16', JSON.stringify(appData));
+const save = () => localStorage.setItem('heli_pro_v17', JSON.stringify(appData));
 
 function init() {
     const k = getK(vDate);
@@ -524,9 +524,11 @@ function openReportMode() {
     // BMI Logic
     const profile = appData.userProfile || {};
     let bmiDisplay = '--';
-    let bmiStatus = 'חסר גובה בפרופיל';
+    let bmiStatus = '';
     
-    if(profile.height && curW) {
+    if(!profile.height) bmiStatus = 'חסר גובה (הגדר בפרופיל)';
+    else if(!curW) bmiStatus = 'חסר משקל (הזן למטה)';
+    else {
         const hM = profile.height / 100;
         const bmi = (curW / (hM * hM)).toFixed(1);
         bmiDisplay = bmi;
@@ -617,22 +619,25 @@ function openProfile() {
             </select>
             
             <button class="btn-primary" onclick="saveProfile()">שמור פרופיל</button>
-            <p style="font-size:0.8rem; color:#666; margin-top:10px;">* הנתונים משמשים לחישוב BMI בלבד ונשמרים בטלפון שלך.</p>
+            <p style="font-size:0.8rem; color:#666; margin-top:10px;">* הנתונים משמשים לחישוב BMI בלבד.</p>
         </div>
     `;
     document.getElementById('modal').style.display = 'flex';
 }
 
 function saveProfile() {
+    const h = parseInt(document.getElementById('p-height').value);
+    if(!h) return alert('חובה להזין גובה');
+    
     appData.userProfile = {
-        height: parseInt(document.getElementById('p-height').value),
+        height: h,
         age: parseInt(document.getElementById('p-age').value),
         gender: document.getElementById('p-gender').value
     };
     save();
     alert('הפרופיל נשמר בהצלחה!');
     closeModal();
-    init(); // To update any potential stats dependent on profile
+    init(); 
 }
 
 // --- TIPS & TOOLS ---
