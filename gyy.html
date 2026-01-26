@@ -1,0 +1,138 @@
+להלן קוד ה-HTML המלא. שמור כקובץ guide.html ופתח בדפדפן.
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini למשווקים: המדריך</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f1f5f9;
+            --accent: #38bdf8;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 40px;
+        }
+        h1 { margin: 0; font-size: 2.5rem; color: var(--accent); }
+        h2 { color: var(--accent); border-right: 4px solid var(--primary); padding-right: 15px; margin-top: 0; }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .code-box {
+            background-color: #000;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            color: #4ade80;
+            position: relative;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        .tag {
+            background-color: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Gemini למשווקים</h1>
+        <p>המדריך המהיר: פרומפטים, הגדרות ושיטות עבודה</p>
+    </header>
+
+    <div class="card">
+        <span class="tag">שלב 1: Setup</span>
+        <h2>הגדרת ה"פרסונה" (System Prompt)</h2>
+        <p>לפני שמתחילים, העתק את ההגדרה הזו כדי לכוונן אותי למצב שיווק:</p>
+        <div class="code-box">
+"פעל כקופירייטר ומנהל קריאייטיב בכיר עם 10 שנות ניסיון.
+הטון שלך: שנון, חד, קצר ומניע לפעולה (Call to Action).
+קהל היעד: ישראלים, גילאי 25-45, חובבי טכנולוגיה.
+המטרה: מקסימום מעורבות (Engagement)."
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="tag">שלב 2: יצירת תוכן</span>
+        <h2>נוסחאות לפוסטים והוקים</h2>
+        <p>וריאציות לפוסט לינקדאין:</p>
+        <div class="code-box">
+"כתוב לי 3 וריאציות לפוסט לינקדאין על [הנושא שלך].
+1. וריאציה רצינית ומקצועית.
+2. וריאציה הומוריסטית וקלילה.
+3. וריאציה פרובוקטיבית שמעוררת דיון."
+        </div>
+        <p style="margin-top: 15px;">יצירת הוקים (Hooks) לסרטונים:</p>
+        <div class="code-box">
+"תן לי 5 משפטי פתיחה (Hooks) לשניות הראשונות של סרטון טיקטוק בנושא [הנושא שלך], שאי אפשר יהיה להתעלם מהם."
+        </div>
+    </div>
+
+    <div class="card">
+        <span class="tag">שלב 3: אסטרטגיה</span>
+        <h2>מחקר שוק ותכנון</h2>
+        <p>ניתוח כאבי לקוח:</p>
+        <div class="code-box">
+"נתח את הכאבים המרכזיים והנסתרים של לקוחות ששוקלים לקנות [המוצר שלך]. מה מונע מהם לישון בלילה בהקשר הזה?"
+        </div>
+        <p style="margin-top: 15px;">בניית גאנט תוכן:</p>
+        <div class="code-box">
+"בנה טבלת גאנט שבועית לתוכן באינסטגרם לחודש הקרוב. כלול עמודות ל: נושא, פורמט (רילס/סטורי/פוסט), וכותרת ראשית."
+        </div>
+    </div>
+
+    <div class="card" style="border-right: 4px solid #4ade80;">
+        <span class="tag" style="background-color: #4ade80; color: black;">Pro Tips</span>
+        <h2>טיפים למקצוענים</h2>
+        <ul>
+            <li><strong>דיוק:</strong> ציין תמיד את הפלט (טבלה, HTML, רשימה).</li>
+            <li><strong>ביקורת עצמית:</strong> בקש ממני: "מה חסר בטקסט הזה כדי שיהיה ויראלי?"</li>
+            <li><strong>שכתוב אגרסיבי:</strong> "קצר את הטקסט ב-50% והפוך אותו ליותר פאנצ'י."</li>
+        </ul>
+    </div>
+
+    <footer>
+        נוצר עבורך על ידי Gemini
+    </footer>
+</div>
+
+</body>
+</html>
+
