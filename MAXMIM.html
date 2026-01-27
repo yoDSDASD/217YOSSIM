@@ -3,382 +3,211 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <title>סיכום מינימום/מקסימום מדידות</title>
+  <title>מחשבון מדידות מהיר</title>
   <style>
     :root{
-      --bg:#0b0f14;
-      --card:#111824;
-      --card2:#0f1620;
-      --text:#e8eef6;
-      --muted:#aab6c5;
-      --line:rgba(255,255,255,.08);
-      --focus:#8ab4ff;
-      --good:#49d17c;
-      --bad:#ff5d5d;
-      --warn:#ffd166;
-      --shadow: 0 12px 30px rgba(0,0,0,.35);
-      --r:16px;
-      --font: system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      --bg:#0b0f14; --card:#111824; --text:#e8eef6; --muted:#aab6c5;
+      --line:rgba(255,255,255,.08); --focus:#8ab4ff;
+      --font: system-ui,-apple-system,sans-serif;
     }
-
     *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-    
     body{
-      margin:0;
-      background: radial-gradient(1200px 800px at 20% 10%, rgba(138,180,255,.18), transparent 55%),
-                  radial-gradient(1000px 700px at 80% 20%, rgba(73,209,124,.14), transparent 60%),
-                  var(--bg);
-      color:var(--text);
-      font-family:var(--font);
-      line-height:1.35;
-      overflow-x: hidden; /* מונע גלילה רוחבית של כל הדף */
+      margin:0; background:var(--bg); color:var(--text); font-family:var(--font);
+      padding:10px; overflow-x:hidden;
     }
+    .wrap{ max-width:800px; margin:0 auto; }
+    
+    /* כותרת */
+    header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+    h1{ font-size:18px; margin:0; }
+    .pill{ font-size:12px; color:var(--muted); background:rgba(255,255,255,.05); padding:4px 8px; border-radius:4px; }
 
-    .wrap{
-      max-width:1100px;
-      margin:0 auto;
-      padding:22px 16px 40px;
-    }
-    /* התאמה לנייד - צמצום שוליים */
-    @media (max-width: 480px){
-      .wrap{ padding: 14px 10px 80px; }
-    }
-
-    header{
-      display:flex;
-      gap:14px;
-      align-items:flex-start;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      margin-bottom:14px;
-    }
-
-    .title h1{
-      font-size:20px;
-      margin:0 0 6px 0;
-    }
-    .subtitle{
-      color:var(--muted);
-      font-size:13px;
-      margin:0;
-    }
-
-    /* גריד ראשי רספונסיבי */
-    .grid{
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap:14px;
-    }
-    @media (max-width: 920px){
-      .grid{ grid-template-columns: 1fr; }
-    }
-
+    /* כרטיסים */
     .card{
-      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 65%), var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      box-shadow:var(--shadow);
-      padding:14px;
-      min-width:0; 
+      background:var(--card); border:1px solid var(--line); border-radius:12px;
+      padding:15px; margin-bottom:15px; box-shadow:0 4px 12px rgba(0,0,0,0.2);
     }
 
-    .summary{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
-    @media (max-width: 500px){
-      .summary{ grid-template-columns: 1fr; }
-    }
+    /* תוצאות גדולות */
+    .big-res{ display:flex; gap:10px; justify-content:space-around; text-align:center; margin-bottom:10px; }
+    .res-box{ flex:1; background:rgba(255,255,255,.03); padding:10px; border-radius:8px; border:1px solid var(--line); }
+    .res-val{ font-size:24px; font-weight:800; display:block; color:#fff; }
+    .res-lbl{ font-size:12px; color:var(--muted); }
+    .min-c{ color:#49d17c; } /* ירוק */
+    .max-c{ color:#ff5d5d; } /* אדום */
 
-    .metric{
-      background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 70%), var(--card2);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-    }
-    .metric .k{ color:var(--muted); font-size:12px; margin-bottom:6px; }
-    .metric .v{ font-size:22px; font-weight:800; display:flex; gap:8px; align-items:baseline; flex-wrap:wrap; }
-    .metric .v small{ font-size:12px; color:var(--muted); font-weight:600; }
+    /* סטטוס */
+    .status-bar{ display:flex; gap:15px; font-size:13px; color:var(--muted); justify-content:center; }
+    strong{ color:#fff; }
 
-    .pill{
-      display:inline-flex; align-items:center; gap:8px; padding:6px 10px;
-      border-radius:999px; border:1px solid var(--line);
-      color:var(--muted); font-size:12px; background:rgba(255,255,255,.02);
-      white-space:nowrap;
+    /* שליטה */
+    label{ font-size:12px; color:var(--muted); margin-bottom:5px; display:block; }
+    textarea{
+      width:100%; height:120px; background:rgba(0,0,0,.3); border:1px solid var(--line);
+      color:#fff; padding:10px; border-radius:8px; font-size:16px; outline:none;
+      font-family: monospace;
     }
+    textarea:focus{ border-color:var(--focus); }
 
-    .controls{ display:flex; flex-direction:column; gap:12px; }
-    
-    label{ display:block; font-size:12px; color:var(--muted); margin-bottom:6px; }
+    .inputs-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px; }
+    input{ width:100%; background:rgba(0,0,0,.3); border:1px solid var(--line); color:#fff; padding:8px; border-radius:6px; text-align:center; font-size:16px; }
 
-    /* פונט 16px מונע זום באייפון */
-    textarea, input[type="text"], input[type="number"]{
-      width:100%; border-radius:12px; border:1px solid var(--line);
-      background:rgba(255,255,255,.03); color:var(--text);
-      padding:12px; outline:none; font-size:16px; 
-      transition: border-color .2s;
-    }
-    textarea{ min-height:150px; resize:vertical; }
-    textarea:focus, input:focus{ outline:2px solid rgba(138,180,255,.55); outline-offset:-1px; }
-
-    .row{
-      display:grid; grid-template-columns: 1fr 140px; gap:10px; align-items:end;
-    }
-    @media (max-width: 500px){
-      .row{ grid-template-columns: 1fr; }
-    }
-
-    .btns{ display:flex; flex-wrap:wrap; gap:10px; margin-top:4px; }
-    
+    /* כפתורים */
+    .btns{ display:grid; grid-template-columns: 2fr 1fr; gap:10px; margin-top:10px; }
     button{
-      border:1px solid var(--line); background:rgba(255,255,255,.04);
-      color:var(--text); padding:12px 16px; border-radius:12px;
-      cursor:pointer; font-weight:700; font-size:14px;
-      transition: transform .05s, background .15s;
-      flex: 1 1 auto; /* כפתורים מתרחבים בנייד */
-      min-width: 100px;
-      display: flex; justify-content: center; align-items: center;
+      padding:12px; border:none; border-radius:8px; font-weight:bold; cursor:pointer; font-size:16px;
+      transition:0.2s;
     }
-    button:active{ transform: scale(0.98); }
-    
-    .primary{ border-color: rgba(138,180,255,.35); background: rgba(138,180,255,.10); }
-    .danger{ border-color: rgba(255,93,93,.35); background: rgba(255,93,93,.10); }
+    .btn-main{ background:var(--focus); color:#000; }
+    .btn-sec{ background:rgba(255,255,255,.1); color:#fff; }
+    button:active{ transform:scale(0.96); }
 
-    .tableWrap{
-      overflow-x:auto; /* גלילה פנימית לטבלה */
-      -webkit-overflow-scrolling: touch; /* גלילה חלקה בנייד */
-      border-radius:14px; border:1px solid var(--line);
-      background:rgba(255,255,255,.02);
-    }
-    
-    table{ width:100%; border-collapse:separate; border-spacing:0; min-width:600px; }
-    thead th{
-      position:sticky; top:0; background:rgba(17,24,36,.98); backdrop-filter:blur(6px);
-      z-index:2; border-bottom:1px solid var(--line);
-      font-size:12px; text-align:right; padding:12px; color:var(--muted);
-    }
-    tbody td{
-      border-bottom:1px solid rgba(255,255,255,.06);
-      padding:12px; font-size:14px; white-space:nowrap;
-    }
-    
-    .tag{
-      display:inline-flex; align-items:center; padding:3px 8px;
-      border-radius:999px; border:1px solid var(--line);
-      font-size:12px; color:var(--muted); background:rgba(255,255,255,.02);
-    }
-    .tag.min{ border-color:rgba(73,209,124,.35); color:rgba(73,209,124,.95); background:rgba(73,209,124,.08); }
-    .tag.max{ border-color:rgba(255,209,102,.45); color:rgba(255,209,102,.95); background:rgba(255,209,102,.10); }
-
-    .status{ margin-top:10px; font-size:12px; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap; }
-    .status strong{ color:var(--text); }
+    /* טבלה */
+    table{ width:100%; border-collapse:collapse; margin-top:10px; font-size:14px; }
+    th{ text-align:right; color:var(--muted); padding:5px; border-bottom:1px solid var(--line); font-size:12px; }
+    td{ padding:8px 5px; border-bottom:1px solid rgba(255,255,255,.05); }
+    tr:last-child td{ border:none; }
+    .idx{ color:var(--muted); font-size:11px; width:30px; }
   </style>
 </head>
-
 <body>
-  <div class="wrap">
-    <header>
-      <div class="title">
-        <h1>מחשבון מדידות (CMM)</h1>
-        <p class="subtitle">הזן נתונים, קבל סטטיסטיקה וסימון חריגות.</p>
+
+<div class="wrap">
+  <header>
+    <h1>בדיקת מינימום/מקסימום</h1>
+    <div class="pill" id="clock">--:--</div>
+  </header>
+
+  <div class="card">
+    <div class="big-res">
+      <div class="res-box">
+        <span class="res-lbl">מינימום</span>
+        <span class="res-val min-c" id="minVal">-</span>
       </div>
-      <div class="pill" id="nowPill"></div>
-    </header>
-
-    <section class="grid">
-      <div class="card">
-        <h2 style="margin:0 0 12px; font-size:15px;">סיכום תוצאות</h2>
-        <div class="summary">
-          <div class="metric">
-            <div class="k">מדידה נמוכה (Min)</div>
-            <div class="v"><span id="minVal">—</span> <small id="minMeta"></small></div>
-          </div>
-          <div class="metric">
-            <div class="k">מדידה גבוהה (Max)</div>
-            <div class="v"><span id="maxVal">—</span> <small id="maxMeta"></small></div>
-          </div>
-        </div>
-        <div class="status">
-          <span>סה״כ: <strong id="count">0</strong></span>
-          <span>תקין: <strong id="valid">0</strong></span>
-          <span style="color:var(--bad);">שגוי: <strong id="invalid">0</strong></span>
-        </div>
+      <div class="res-box">
+        <span class="res-lbl">מקסימום</span>
+        <span class="res-val max-c" id="maxVal">-</span>
       </div>
-
-      <div class="card">
-        <h2 style="margin:0 0 12px; font-size:15px;">נתונים</h2>
-        <div class="controls">
-          <div class="row">
-            <div>
-              <label>יחידות מידה</label>
-              <input id="unit" type="text" value="מ״מ" />
-            </div>
-            <div>
-              <label>דיוק ספרות</label>
-              <input id="decimals" type="number" min="0" max="6" value="3" inputmode="numeric" />
-            </div>
-          </div>
-
-          <div>
-            <label>הדבק נתונים (שם, ערך)</label>
-            <textarea id="data" placeholder="דוגמה:
-Dia1, 5.021
-Dia2, 4.998
-Length, 12.005"></textarea>
-          </div>
-
-          <div class="btns">
-            <button class="primary" id="btnCalc">חשב</button>
-            <button id="btnDemo">דוגמה</button>
-            <button id="btnCopy">העתק</button>
-            <button class="danger" id="btnClear">נקה</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="card" style="margin-top:14px;">
-      <h2 style="margin:0 0 12px; font-size:15px;">פירוט מלא</h2>
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:50px;">#</th>
-              <th>שם האלמנט</th>
-              <th style="width:140px;">תוצאה</th>
-              <th style="width:110px;">סטטוס</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
+    </div>
+    <div class="status-bar">
+      <span>כמות: <strong id="count">0</strong></span>
+      <span>טווח: <strong id="range">-</strong></span>
     </div>
   </div>
 
+  <div class="card">
+    <div class="inputs-row">
+      <div>
+        <label>ספרות אחרי נקודה</label>
+        <input type="number" id="decimals" value="3" inputmode="numeric">
+      </div>
+      <div>
+        <label>יחידות</label>
+        <input type="text" id="unit" value="מ״מ">
+      </div>
+    </div>
+
+    <label>הדבק כאן את המספרים (עם רווחים, שורות או בלאגן)</label>
+    <textarea id="inputArea" placeholder="למשל: 5.01 5.02 4.99"></textarea>
+
+    <div class="btns">
+      <button class="btn-main" id="btnCalc">חשב וסדר נתונים</button>
+      <button class="btn-sec" id="btnClear">נקה</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <label>רשימת מדידות שזוהו:</label>
+    <div style="max-height:300px; overflow-y:auto;">
+      <table id="dataTable">
+        <thead>
+          <tr><th>#</th><th>ערך</th><th>סטטוס</th></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 <script>
-(() => {
-  const el = (id) => document.getElementById(id);
-  const elements = {
-    data: el("data"), unit: el("unit"), dec: el("decimals"),
-    minVal: el("minVal"), maxVal: el("maxVal"),
-    minMeta: el("minMeta"), maxMeta: el("maxMeta"),
-    count: el("count"), valid: el("valid"), invalid: el("invalid"),
-    tbody: el("tbody"), nowPill: el("nowPill")
-  };
+// פונקציות עזר קצרות
+const el = (id) => document.getElementById(id);
+const fmt = (n, d) => n.toFixed(d);
 
-  const setNow = () => {
-    const d = new Date();
-    elements.nowPill.textContent = d.toLocaleTimeString("he-IL", {hour:"2-digit", minute:"2-digit"}) + " | " + d.toLocaleDateString("he-IL");
-  };
-  setNow();
+// שעון
+setInterval(() => {
+  const d = new Date();
+  el('clock').textContent = d.toLocaleTimeString('he-IL', {hour:'2-digit', minute:'2-digit'});
+}, 1000);
 
-  const normalizeNumber = (str) => {
-    const s = String(str).trim().replace(/\u00A0/g, " "); // ניקוי רווחים קשיחים
-    if (!s) return null;
-    // החלפת פסיק עשרוני לנקודה אם אין נקודה אחרת
-    const fixed = (s.includes(",") && !s.includes(".")) ? s.replace(",", ".") : s;
-    const n = Number(fixed);
-    return Number.isFinite(n) ? n : null;
-  };
+function calculate() {
+  const rawText = el('inputArea').value;
+  const decimals = parseInt(el('decimals').value) || 3;
+  const unitStr = el('unit').value;
 
-  const parseLines = (raw) => {
-    return raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean).map(line => {
-      let name = "ללא שם", valStr = "";
-      
-      // לוגיקת זיהוי חכמה (CSV, TSV, רווחים)
-      if (line.includes(",")) {
-        const i = line.lastIndexOf(",");
-        name = line.slice(0, i).trim() || name;
-        valStr = line.slice(i + 1).trim();
-      } else if (line.includes("\t")) {
-        const parts = line.split("\t").filter(Boolean);
-        valStr = parts.pop() || "";
-        name = parts.join(" ").trim() || name;
-      } else {
-        const parts = line.split(/\s+/);
-        valStr = parts.pop() || "";
-        name = parts.join(" ").trim() || name;
-      }
+  // 1. חילוץ מספרים באמצעות Regex (חכם יותר)
+  // מחפש רצפים של מספרים, כולל נקודה עשרונית ומינוס
+  // מתעלם מטקסטים כמו "Dia" או "Len"
+  const matches = rawText.match(/-?\d+(\.\d+)?/g);
 
-      const val = normalizeNumber(valStr);
-      return { line, name, val, ok: val !== null, valStr };
-    });
-  };
+  if (!matches || matches.length === 0) {
+    el('tbody').innerHTML = '<tr><td colspan="3" style="text-align:center; padding:10px;">לא זוהו מספרים</td></tr>';
+    el('minVal').textContent = '-';
+    el('maxVal').textContent = '-';
+    el('count').textContent = '0';
+    el('range').textContent = '-';
+    return;
+  }
 
-  const fmt = (n) => n.toFixed(Math.max(0, Math.min(6, elements.dec.value || 3)));
-
-  const render = () => {
-    setNow();
-    const rows = parseLines(elements.data.value);
-    const valid = rows.filter(r => r.ok);
-    const unit = elements.unit.value.trim();
-
-    // עדכון מונים
-    elements.count.textContent = rows.length;
-    elements.valid.textContent = valid.length;
-    elements.invalid.textContent = rows.length - valid.length;
-
-    // חישוב מינימום/מקסימום
-    let minR = null, maxR = null;
-    if (valid.length) {
-      minR = valid.reduce((p, c) => p.val < c.val ? p : c);
-      maxR = valid.reduce((p, c) => p.val > c.val ? p : c);
-      
-      elements.minVal.textContent = fmt(minR.val) + (unit ? " "+unit : "");
-      elements.minMeta.textContent = minR.name;
-      elements.maxVal.textContent = fmt(maxR.val) + (unit ? " "+unit : "");
-      elements.maxMeta.textContent = maxR.name;
-    } else {
-      elements.minVal.textContent = "—"; elements.minMeta.textContent = "";
-      elements.maxVal.textContent = "—"; elements.maxMeta.textContent = "";
-    }
-
-    // בניית טבלה
-    if (!rows.length) {
-      elements.tbody.innerHTML = `<tr><td colspan="4" style="padding:16px;color:#aab6c5;text-align:center;">אין נתונים</td></tr>`;
-      return;
-    }
-
-    elements.tbody.innerHTML = rows.map((r, i) => {
-      let statusHtml = `<span class="tag" style="border-color:#ff5d5d;color:#ff5d5d;">שגוי</span>`;
-      let valDisplay = r.valStr;
-      
-      if (r.ok) {
-        valDisplay = fmt(r.val);
-        if (minR && r.val === minR.val) statusHtml = `<span class="tag min">נמוך</span>`;
-        else if (maxR && r.val === maxR.val) statusHtml = `<span class="tag max">גבוה</span>`;
-        else statusHtml = `<span class="tag">תקין</span>`;
-      }
-
-      return `<tr>
-        <td>${i + 1}</td>
-        <td>${r.name}</td>
-        <td style="font-weight:700;direction:ltr;text-align:right;">${valDisplay}</td>
-        <td>${statusHtml}</td>
-      </tr>`;
-    }).join("");
-  };
-
-  // אירועים
-  el("btnCalc").onclick = render;
-  el("btnClear").onclick = () => { elements.data.value = ""; render(); };
-  el("btnDemo").onclick = () => {
-    elements.data.value = `X Axis, 500.012\nY Axis, 499.985\nZ Axis, 120.005\nDiameter A, 25.001\nDiameter B, 24.999`;
-    render();
-  };
+  // המרת מחרוזות למספרים
+  const numbers = matches.map(Number);
   
-  el("btnCopy").onclick = async () => {
-    const txt = parseLines(elements.data.value).map(r => 
-      `${r.name}\t${r.ok ? fmt(r.val) : r.valStr}`
-    ).join("\n");
-    try { await navigator.clipboard.writeText(txt); alert("הועתק!"); } 
-    catch(e) { alert("שגיאת העתקה"); }
-  };
+  // חישובים
+  const min = Math.min(...numbers);
+  const max = Math.max(...numbers);
+  const range = max - min;
 
-  // הרצה ראשונית
-  render();
-})();
+  // עדכון תצוגה עליונה
+  el('minVal').textContent = fmt(min, decimals);
+  el('maxVal').textContent = fmt(max, decimals);
+  el('count').textContent = numbers.length;
+  el('range').textContent = fmt(range, decimals);
+
+  // בניית טבלה
+  let html = '';
+  numbers.forEach((num, idx) => {
+    let style = '';
+    let status = 'תקין';
+    
+    if (num === min) { style = 'color:#49d17c; font-weight:bold;'; status = 'MIN'; }
+    if (num === max) { style = 'color:#ff5d5d; font-weight:bold;'; status = 'MAX'; }
+
+    html += `
+      <tr>
+        <td class="idx">${idx + 1}</td>
+        <td style="direction:ltr; font-family:monospace; font-size:15px; ${style}">${fmt(num, decimals)} ${unitStr}</td>
+        <td style="font-size:12px; ${style}">${status}</td>
+      </tr>
+    `;
+  });
+  el('tbody').innerHTML = html;
+
+  // *** החלק החשוב: סידור הקלט מחדש ***
+  // לוקח את המספרים שמצאנו, ומחזיר אותם לתיבת הטקסט מופרדים בפסיק ורווח
+  el('inputArea').value = numbers.join(', ');
+}
+
+// אירועים
+el('btnCalc').onclick = calculate;
+el('btnClear').onclick = () => {
+  el('inputArea').value = '';
+  calculate();
+  el('inputArea').focus();
+};
+
+// הרצה ראשונית
+calculate();
 </script>
+
 </body>
 </html>
